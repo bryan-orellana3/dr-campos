@@ -1,0 +1,11 @@
+# Del design system solo hacen falta los tokens (los importa global.css).
+# El resto pesa 19 MB y trae nombres con espacios que atascan la subida del CLI.
+design-system/*
+!design-system/styles.css
+!design-system/tokens
+
+.git
+node_modules
+dist
+README.md
+.env*
