@@ -58,10 +58,28 @@ Vite las inyecta en tiempo de build, no de ejecución.
 | Variable | Para qué |
 | --- | --- |
 | `VITE_CTA_URL` | Landing de venta. Sin ella los CTA salen deshabilitados con un aviso visible. |
-| `VITE_LEAD_WEBHOOK` | Endpoint que recibe el lead por POST. Opcional. |
+| `VITE_LEAD_WEBHOOK` | Sobreescribe el inbound webhook de GHL (el de producción va por defecto en `quiz.js`). |
 
-Si el webhook falla, el diagnóstico se muestra igual y el lead queda en `localStorage`
-bajo `dc-quiz-lead-pendiente` — el usuario nunca se queda sin su resultado por un fallo de red.
+## Leads → GoHighLevel
+
+El formulario de captura envía un POST JSON al **inbound webhook** de GHL (`LEAD_WEBHOOK` en
+`src/quiz/data/quiz.js`). El payload lo arma `buildLeadPayload()`: plano, en `snake_case` y
+con valores escalares, para mapearlo campo a campo en el workflow sin transformar nada.
+
+- Contacto con los nombres que GHL reconoce: `first_name`, `last_name` (el nombre se parte
+  con `splitName()`, que separa tratamientos como *Dra.*), `email`, `phone` en E.164.
+- Diagnóstico: `score`, `result_id`, `result_stage`, `plataformas`, `q1_valor…q10_valor`,
+  `q1_respuesta…`, y `tags` (`quiz-riesgo-digital`, `resultado-<id>`).
+- Consentimiento (`consent`, `consent_text`, `consent_at`) y atribución (`utm_*`, `fbclid`,
+  `gclid`, `referrer`, `page_url`).
+
+El envío tiene **tiempo límite de 8 s**. Si GHL falla o no responde, el diagnóstico se muestra
+igual y el lead queda en `localStorage` bajo `dc-quiz-lead-pendiente` — nadie se queda sin su
+resultado por un fallo de red.
+
+El selector de país del WhatsApp (`src/shared/PhoneField.jsx`) es un listbox accesible con
+banderas SVG de `country-flag-icons` — se importan solo las 23 de la lista; un `import *`
+arrastra las 260 del paquete.
 
 ## Comandos
 
