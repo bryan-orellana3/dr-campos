@@ -1,0 +1,225 @@
+/* Tokens de marca: se importan del design system, no se copian. */
+@import '../../../design-system/styles.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-page);
+  color: var(--text-body);
+  font: var(--type-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+/* Botones y opciones.
+   Los estados hover viven en CSS tras `@media (hover: hover)`: en táctil un
+   hover manejado desde React se queda pegado después del tap. `user-select`
+   evita que el tap seleccione el texto en vez de activar el control. */
+
+.dc-btn,
+.dc-option {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.dc-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out);
+}
+
+.dc-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.dc-btn:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.dc-btn--sm {
+  padding: 9px 18px;
+  font-size: 13px;
+}
+.dc-btn--md {
+  padding: 13px 26px;
+  font-size: 15px;
+}
+.dc-btn--lg {
+  padding: 16px 34px;
+  font-size: 16px;
+}
+
+.dc-btn--primary {
+  background: var(--accent-primary);
+  color: #fff;
+}
+.dc-btn--primary:not(:disabled):active {
+  background: var(--dc-navy-800);
+}
+
+.dc-btn--secondary {
+  background: var(--dc-white);
+  color: var(--dc-royal-600);
+  border-color: var(--dc-royal-600);
+}
+
+.dc-btn--ghost {
+  background: transparent;
+  color: var(--dc-royal-600);
+}
+
+.dc-btn--onDark {
+  background: #fff;
+  color: var(--dc-navy-800);
+}
+.dc-btn--onDark:not(:disabled):active {
+  background: var(--dc-sky-200);
+}
+
+@media (hover: hover) {
+  .dc-btn--primary:not(:disabled):hover {
+    background: var(--accent-primary-hover);
+  }
+  .dc-btn--secondary:not(:disabled):hover {
+    background: var(--surface-wash);
+  }
+  .dc-btn--ghost:not(:disabled):hover {
+    background: var(--dc-neutral-100);
+  }
+  .dc-btn--onDark:not(:disabled):hover {
+    background: var(--dc-sky-300);
+  }
+}
+
+.dc-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+
+.dc-option.is-selected {
+  background: var(--surface-wash);
+  border-color: var(--accent-primary);
+  box-shadow: none;
+}
+
+@media (hover: hover) {
+  .dc-option:not(.is-selected):hover {
+    border-color: var(--dc-sky-300);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.dc-option__label {
+  font: var(--type-body);
+  color: var(--text-body);
+}
+
+.dc-option.is-selected .dc-option__label {
+  font-weight: 600;
+  color: var(--text-display);
+}
+
+@media (max-width: 720px) {
+  .dc-option__label {
+    font: var(--type-body-sm);
+  }
+
+  .dc-option.is-selected .dc-option__label {
+    font-weight: 600;
+  }
+}
+
+/* Cursiva por clase: el atajo `font` de los tokens resetea `font-style`,
+   así que mezclarlos en el mismo objeto de estilos provoca conflictos. */
+.dc-italic {
+  font-style: italic;
+}
+
+/* Motion — calm and clinical: fades and small translateY only (140–400ms) */
+@keyframes dc-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes dc-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dc-rise {
+  animation: dc-rise var(--duration-slow) var(--ease-out) both;
+}
+
+.dc-fade {
+  animation: dc-fade var(--duration-base) var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

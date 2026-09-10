@@ -1,0 +1,60 @@
+/* Dr. David Campos — color system
+   Sampled from the master logo and studio backgrounds.
+   Blue is the only brand hue; it moves from deep clinical navy
+   (authority) to luminous sky (accessibility, cercanía). */
+:root {
+  /* Base scale — brand blues */
+  --dc-navy-950: #041A30;   /* near-black navy, ink on light */
+  --dc-navy-900: #022746;   /* deep surface / hero backgrounds */
+  --dc-navy-800: #02325A;   /* logo "Dr." + "DAVID" navy */
+  --dc-navy-700: #063F73;
+  --dc-royal-600: #0A5CA8;  /* logo gradient midpoint */
+  --dc-blue-500: #1D7BC9;   /* interactive primary */
+  --dc-sky-400: #4FA8E0;    /* logo "CAMPOS" light end */
+  --dc-sky-300: #8FCBEF;    /* tints, hovers on dark */
+  --dc-sky-200: #C4E3F8;
+  --dc-sky-100: #E4F2FC;    /* wash backgrounds */
+  --dc-pulse-400: #3ECDE8;  /* EKG pulse cyan — accent only */
+
+  /* Neutrals — cool, blue-cast */
+  --dc-white: #FFFFFF;
+  --dc-neutral-50: #F6F8FB; /* page background (logo canvas tone) */
+  --dc-neutral-100: #EDF1F7;
+  --dc-neutral-200: #DCE3EC;
+  --dc-neutral-300: #C2CCD9;
+  --dc-neutral-500: #5C7189; /* muted text */
+  --dc-neutral-700: #33475C; /* body text */
+
+  /* Semantic status — used sparingly, desaturated to sit with the blues */
+  --dc-success: #1E8A5E;
+  --dc-warning: #B97E1F;
+  --dc-danger: #C0453E;
+
+  /* Semantic aliases */
+  --text-display: var(--dc-navy-800);
+  --text-body: var(--dc-neutral-700);
+  --text-muted: var(--dc-neutral-500);
+  --text-on-dark: #F2F7FC;
+  --text-muted-on-dark: #A8C6DE;
+  --text-link: var(--dc-blue-500);
+
+  --surface-page: var(--dc-neutral-50);
+  --surface-card: var(--dc-white);
+  --surface-raised: var(--dc-white);
+  --surface-wash: var(--dc-sky-100);
+  --surface-dark: var(--dc-navy-900);
+  --surface-dark-raised: #0A3560;
+
+  --border-subtle: var(--dc-neutral-200);
+  --border-strong: var(--dc-neutral-300);
+  --border-on-dark: rgba(143, 203, 239, 0.25);
+
+  --accent-primary: var(--dc-blue-500);
+  --accent-primary-hover: var(--dc-royal-600);
+  --accent-pulse: var(--dc-pulse-400);
+
+  /* Brand gradients — from the wordmark and photo orb */
+  --gradient-wordmark: linear-gradient(90deg, #02325A 0%, #0A5CA8 45%, #4FA8E0 100%); /* @kind color */
+  --gradient-orb: radial-gradient(circle at 35% 30%, #1D7BC9 0%, #0A5CA8 45%, #02325A 100%); /* @kind color */
+  --gradient-hero-dark: linear-gradient(160deg, #022746 0%, #063F73 60%, #0A5CA8 100%); /* @kind color */
+}

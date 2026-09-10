@@ -1,0 +1,25 @@
+<!-- @dsCard group="Brand" viewport="700x200" subtitle="Isotipo (orbe) + logotipo tipográfico para fondos oscuros" name="Logo on dark" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 24px 32px; background: var(--gradient-hero-dark); display: flex; flex-direction: column; gap: 12px; justify-content: center; min-height: 152px; box-sizing: border-box; }
+  .lockup { display: flex; align-items: center; gap: 18px; }
+  .lockup img { height: 84px; }
+  .words { display: flex; flex-direction: column; }
+  .dr { font: 400 34px/0.9 var(--font-script); color: var(--dc-sky-300); }
+  .name { font: 800 28px/1.1 var(--font-display); letter-spacing: var(--tracking-caps); text-transform: uppercase; color: #fff; }
+  .name span { color: var(--dc-sky-300); }
+  .rule { width: 300px; margin-left: 102px; }
+  .meta { font: var(--type-caption); color: var(--text-muted-on-dark); margin-left: 102px; }
+</style></head>
+<body>
+  <div class="lockup">
+    <img src="../assets/isotipo.png" alt="Isotipo Dr. David Campos">
+    <div class="words">
+      <span class="dr">Dr.</span>
+      <span class="name">David <span>Campos</span></span>
+    </div>
+  </div>
+  <svg class="rule" viewBox="0 0 320 20" fill="none"><path d="M0 10 H210 L218 10 223 2 230 18 236 10 H320" stroke="var(--dc-pulse-400)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" style="filter: drop-shadow(0 0 6px rgba(62,205,232,0.8));"></path></svg>
+  <div class="meta">Isotipo: la foto del doctor (assets/isotipo.png) · Logotipo: "Dr. David Campos" — script oficial: Brittany Signature (falta el archivo de fuente; fallback Sacramento).</div>
+</body></html>

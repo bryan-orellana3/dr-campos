@@ -1,0 +1,22 @@
+/* Dr. David Campos — spacing, radius, layout */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* Radii — soft but disciplined; full-round reserved for pills & the photo orb */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+
+  --container-max: 1120px;
+  --content-measure: 64ch;
+}

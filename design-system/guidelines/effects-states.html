@@ -1,0 +1,18 @@
+<!-- @dsCard group="Effects" viewport="700x170" subtitle="Hover darkens, press settles — no bounces" name="Interaction states" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface-page); display: flex; gap: 24px; align-items: center; }
+  .btn { font: 700 15px/1 var(--font-display); letter-spacing: 0.02em; color: #fff; background: var(--accent-primary); border: none; border-radius: var(--radius-pill); padding: 15px 28px; cursor: pointer; transition: background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out); }
+  .btn:hover { background: var(--accent-primary-hover); }
+  .btn:active { background: var(--dc-navy-800); transform: translateY(1px); }
+  .btn:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+  .card { background: var(--dc-white); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 18px 22px; font: var(--type-body-sm); color: var(--text-body); transition: box-shadow var(--duration-base) var(--ease-out); cursor: pointer; }
+  .card:hover { box-shadow: var(--shadow-md); }
+  .meta { font: var(--type-caption); color: var(--text-muted); max-width: 200px; }
+</style></head>
+<body>
+  <button class="btn">Aplicar al programa</button>
+  <div class="card">Hover: la tarjeta se eleva<br>(shadow-sm → shadow-md)</div>
+  <div class="meta">140–220ms · ease-out · hover oscurece un paso · press +1px translateY</div>
+</body></html>

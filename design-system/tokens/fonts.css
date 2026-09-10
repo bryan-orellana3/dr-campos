@@ -1,0 +1,10 @@
+/* Dr. David Campos — webfonts
+   NOTE: No brand font binaries were provided. These are Google Fonts
+   substitutions matched to the logo lettering:
+   - Montserrat  → geometric caps of the "DAVID CAMPOS" wordmark
+   - Source Sans 3 → clean humanist body copy
+   - Sacramento → fallback for the script "Dr." — the real brand script is
+     **Brittany Signature** (commercial; binary not provided — upload it and
+     replace this fallback with a real @font-face rule)
+   Replace with licensed brand fonts when available. */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Sacramento&display=swap');

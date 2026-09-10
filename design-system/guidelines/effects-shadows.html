@@ -1,0 +1,14 @@
+<!-- @dsCard group="Effects" viewport="700x170" subtitle="Navy-tinted elevation + cyan pulse glow" name="Shadows" -->
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin: 0; padding: 24px; background: var(--surface-page); display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+  .box { height: 90px; border-radius: var(--radius-lg); background: var(--dc-white); display: flex; align-items: center; justify-content: center; font: var(--type-caption); color: var(--text-muted); }
+  .dark { background: var(--dc-navy-900); color: var(--text-muted-on-dark); }
+</style></head>
+<body>
+  <div class="box" style="box-shadow: var(--shadow-sm);">--shadow-sm</div>
+  <div class="box" style="box-shadow: var(--shadow-md);">--shadow-md</div>
+  <div class="box" style="box-shadow: var(--shadow-lg);">--shadow-lg</div>
+  <div class="box dark" style="box-shadow: var(--shadow-pulse);">--shadow-pulse</div>
+</body></html>
