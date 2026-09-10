@@ -5,7 +5,7 @@ import Dato from './screens/Dato.jsx';
 import Capture from './screens/Capture.jsx';
 import Result from './screens/Result.jsx';
 import { BrandLock, useIsMobile } from '../shared/ui.jsx';
-import { LEAD_WEBHOOK, QUESTIONS, STEPS, computeScore, resultForScore } from './data/quiz.js';
+import { LEAD_WEBHOOK, QUESTIONS, STEPS, buildLeadPayload, computeScore, resultForScore } from './data/quiz.js';
 
 const STORAGE_KEY = 'dc-quiz-riesgo-digital-v2';
 const PENDING_KEY = 'dc-quiz-lead-pendiente';
@@ -166,26 +166,26 @@ export default function App() {
 
   const submitLead = async (data) => {
     setSubmitting(true);
-    const payload = {
-      ...data,
-      score,
-      resultId: result.id,
-      resultStage: result.stage,
-      resultTitle: result.title,
+    const payload = buildLeadPayload({
+      lead: data,
       answers,
-      plataformas: answers.q2 ?? [],
-      plataformaOtra: otherText.trim() || undefined,
-      quiz: 'riesgo-digital',
-      completedAt: new Date().toISOString(),
-      ...campaignParams(),
-    };
+      otherText,
+      score,
+      result,
+      attribution: campaignParams(),
+    });
 
     if (LEAD_WEBHOOK) {
+      // Tiempo límite: un GHL lento nunca deja al médico mirando "Preparando…".
+      const abort = new AbortController();
+      const timer = window.setTimeout(() => abort.abort(), 8000);
       try {
         const res = await fetch(LEAD_WEBHOOK, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
+          keepalive: true,
+          signal: abort.signal,
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
       } catch (err) {
@@ -198,6 +198,8 @@ export default function App() {
           /* sin almacenamiento disponible */
         }
         console.warn('No se pudo enviar el lead al webhook:', err);
+      } finally {
+        window.clearTimeout(timer);
       }
     }
 

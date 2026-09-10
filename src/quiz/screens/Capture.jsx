@@ -1,17 +1,8 @@
 import React from 'react';
-import {
-  Button,
-  Input,
-  Select,
-  PulseDivider,
-  ArrowLeft,
-  ArrowRight,
-  Lock,
-  useIsMobile,
-} from '../../shared/ui.jsx';
-import { COUNTRIES, countryByIso, guessCountry } from '../data/countries.js';
-
-const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.iso, label: `${c.name} +${c.dial}` }));
+import { Button, Input, PulseDivider, ArrowLeft, ArrowRight, Lock, useIsMobile } from '../../shared/ui.jsx';
+import PhoneField from '../../shared/PhoneField.jsx';
+import { countryByIso, guessCountry } from '../data/countries.js';
+import { CONSENT_TEXT } from '../data/quiz.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
 
@@ -132,37 +123,13 @@ export default function Capture({ onSubmit, submitting, submitError, onBack }) {
           enterKeyHint="next"
         />
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <span style={{ font: '600 13px/1.2 var(--font-body)', color: 'var(--text-display)' }}>
-            WhatsApp
-          </span>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : 'minmax(0, 1.15fr) minmax(0, 1fr)',
-              gap: 10,
-            }}
-          >
-            <Select
-              options={COUNTRY_OPTIONS}
-              value={form.country}
-              onChange={set('country')}
-              aria-label="País"
-            />
-            <Input
-              value={form.phone}
-              onChange={set('phone')}
-              error={errors.phone}
-              prefix={`+${countryByIso(form.country).dial}`}
-              placeholder="Número"
-              type="tel"
-              inputMode="numeric"
-              autoComplete="tel-national"
-              enterKeyHint="done"
-              aria-label="Número de WhatsApp"
-            />
-          </div>
-        </div>
+        <PhoneField
+          country={form.country}
+          phone={form.phone}
+          onCountryChange={(iso) => set('country')({ target: { value: iso } })}
+          onPhoneChange={(v) => set('phone')({ target: { value: v } })}
+          error={errors.phone}
+        />
 
         {submitError && (
           <p style={{ font: 'var(--type-body-sm)', color: 'var(--dc-danger)', margin: 0 }}>

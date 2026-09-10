@@ -9,10 +9,17 @@
 export const CTA_URL = import.meta.env.VITE_CTA_URL || '#';
 
 /**
- * Endpoint opcional para recibir los leads (webhook de GoHighLevel, Zapier, Make…).
- * Si no está definido, el lead se guarda solo en localStorage y el quiz continúa igual.
+ * Inbound webhook de GoHighLevel que recibe cada lead.
+ * VITE_LEAD_WEBHOOK lo sobreescribe (p. ej. para apuntar a un workflow de pruebas).
+ * Si el envío falla, el diagnóstico se muestra igual y el lead queda en localStorage.
  */
-export const LEAD_WEBHOOK = import.meta.env.VITE_LEAD_WEBHOOK || '';
+export const LEAD_WEBHOOK =
+  import.meta.env.VITE_LEAD_WEBHOOK ||
+  'https://services.leadconnectorhq.com/hooks/JcY02EUFgsn63RSQqI5G/webhook-trigger/174a6b8d-20fa-46c2-a362-c4a5ae57178a';
+
+/** Texto exacto que el médico acepta al pulsar el botón. Viaja en el payload como evidencia. */
+export const CONSENT_TEXT =
+  'Al pulsar aceptas recibir tu diagnóstico y el material del método por WhatsApp y correo. Sin spam; puedes darte de baja cuando quieras.';
 
 export const QUESTIONS = [
   {
@@ -346,4 +353,72 @@ export const STEPS = (() => {
 /** Índice del paso de una pregunta dentro de STEPS. */
 export function stepIndexOfQuestion(questionId) {
   return STEPS.findIndex((s) => s.kind === 'question' && s.question.id === questionId);
+}
+
+const HONORIFIC = /^(dr|dra|doctor|doctora|lic|lcda|lcdo|mtro|mtra|ing)\.?\s+/i;
+const HONORIFIC_CANON = {
+  dr: 'Dr.', doctor: 'Dr.', dra: 'Dra.', doctora: 'Dra.',
+  lic: 'Lic.', lcdo: 'Lcdo.', lcda: 'Lcda.', mtro: 'Mtro.', mtra: 'Mtra.', ing: 'Ing.',
+};
+
+/**
+ * "Dra. Lucía Herrera" → { honorific: 'Dra.', first_name: 'Lucía', last_name: 'Herrera' }.
+ * GHL no llena el nombre del contacto desde un campo `name`: necesita first/last.
+ */
+export function splitName(fullName) {
+  const raw = fullName.trim().replace(/\s+/g, ' ');
+  const m = raw.match(HONORIFIC);
+  const honorific = m ? HONORIFIC_CANON[m[1].toLowerCase()] ?? '' : '';
+  const rest = m ? raw.slice(m[0].length) : raw;
+  const [first_name = '', ...tail] = rest.split(' ');
+  return { honorific, first_name, last_name: tail.join(' ') };
+}
+
+/**
+ * Payload plano para el inbound webhook de GHL. Claves en snake_case y valores escalares:
+ * así cada una se mapea a un campo del contacto sin transformar nada en el workflow.
+ */
+export function buildLeadPayload({ lead, answers, otherText, score, result, attribution }) {
+  const { honorific, first_name, last_name } = splitName(lead.name);
+  const byId = Object.fromEntries(QUESTIONS.map((q) => [q.id, q]));
+  const label = (qid) => byId[qid]?.options.find((o) => o.value === answers[qid])?.label ?? '';
+  const plataformas = (answers.q2 ?? [])
+    .map((v) => (v === 'otra' ? otherText.trim() || 'Otra' : byId.q2.options.find((o) => o.value === v)?.label))
+    .filter(Boolean);
+
+  return {
+    // — contacto (nombres que GHL reconoce) —
+    first_name,
+    last_name,
+    full_name: lead.name,
+    honorific,
+    email: lead.email,
+    phone: lead.phoneE164,
+    phone_country: lead.country,
+    phone_country_name: lead.countryName,
+    phone_dial: `+${lead.dial}`,
+    phone_national: lead.phone,
+    // — diagnóstico —
+    source: 'Quiz riesgo digital',
+    quiz: 'riesgo-digital',
+    score,
+    score_max: SCORE_MAX,
+    result_id: result.id,
+    result_stage: result.stage,
+    result_title: result.title,
+    tags: ['quiz-riesgo-digital', `resultado-${result.id}`],
+    plataformas: plataformas.join(', '),
+    plataforma_otra: otherText.trim(),
+    ...Object.fromEntries(SCORED_QUESTIONS.map((q) => [`${q.id}_respuesta`, label(q.id)])),
+    ...Object.fromEntries(SCORED_QUESTIONS.map((q) => [`${q.id}_valor`, (answers[q.id] ?? '').toUpperCase()])),
+    // — consentimiento y atribución —
+    consent: true,
+    consent_text: CONSENT_TEXT,
+    consent_at: new Date().toISOString(),
+    submitted_at: new Date().toISOString(),
+    page_url: window.location.href,
+    referrer: document.referrer || '',
+    user_agent: navigator.userAgent,
+    ...attribution,
+  };
 }
