@@ -14,7 +14,7 @@ design-system/     tokens, assets y componentes de marca — la única fuente de
 src/
 ├── main.jsx       enrutador; cada ruta carga su propio bundle (React.lazy)
 ├── shared/        ui.jsx (primitivas del sistema), PhoneField, tracking.js, styles/global.css
-├── landing/       LandingPage.jsx, VslPlayer.jsx, CheckoutModal.jsx, data/offer.js (config + copy)
+├── landing/       LandingPage.jsx, VslPlayer.jsx, CheckoutModal.jsx, OfferCountdown.jsx, data/offer.js (config + copy)
 └── quiz/          QuizApp.jsx, data/ y screens/
 ```
 
@@ -55,10 +55,23 @@ reproducen. Se convirtió con `avconvert --preset PresetAppleM4V720pHD` a `IMG_9
 (3:2) desde los metadatos. Para probar en local: `public/vsl.mp4` + `.env.local` con
 `VITE_VSL_URL=/vsl.mp4` (ambos ignorados en git).
 
-**Oferta.** USD 47, pago único, garantía de devolución de 7 días. Sin order bump, bonos ni upsell.
+**Oferta.** USD 47 como precio final de una oferta exclusiva del 50% (precio de lista USD 94,
+tachado), pago único, garantía de devolución de 7 días. Sin order bump, bonos ni upsell. La página
+no tiene sección de recursos descargables ni de preguntas frecuentes (se quitaron el 11 sep 2026);
+lo incluido se lista en "Acceso al método".
 
-**Barra fija.** En todas las pantallas, una barra inferior fija con el precio y "Quiero el Método 4C"
-acompaña toda la página (se oculta mientras el popup está abierto). Sin invitación al quiz al pie.
+**Reloj de la oferta.** `OfferCountdown.jsx`: una cuenta regresiva de 10 minutos
+(`OFFER_TIMER.minutes`, o `VITE_OFFER_TIMER_MINUTES`) que arranca en la primera visita de la
+sesión y sobrevive a recargas y cambios de ruta (`sessionStorage`, clave `dc-offer-deadline`); una
+pestaña nueva la reinicia y, si venció, se queda en "La oferta está por cerrar" (no se reinicia al
+recargar). El mismo contador se muestra en tres sitios: bajo el botón del hero (junto a
+"~~USD 94~~ USD 47 · 50% OFF · pago único…"), en la tarjeta de precio de "Acceso al método" y en la
+barra fija. El precio del checkout de GHL no cambia con el reloj: es un elemento de urgencia.
+
+**Barra fija.** En todas las pantallas, una barra inferior fija navy (borde y reloj cian, botón
+blanco con brillo) con el precio tachado, la etiqueta "50% OFF", el reloj y "Quiero el Método 4C"
+acompaña toda la página (se oculta mientras el popup está abierto). En móvil va en dos filas:
+precio + reloj compacto arriba, botón a todo el ancho abajo. Sin invitación al quiz al pie.
 
 **Checkout.** El botón de compra abre un popup con el order form de GHL en un iframe. El formulario
 está configurado en GHL con *On Submit → Redirect to URL →* `https://dr-david-campos.vercel.app/gracias`: `form_embed.js` aplica esa redirección a la página
@@ -86,7 +99,9 @@ Las cifras coinciden con lo que el Dr. Campos dice en la lección 1.3 (3.000–6
 3. **Captura** — nombre, email y WhatsApp con selector de país (el país se adivina por zona horaria).
 4. **Resultado** — puntaje sobre 27, medidor ECG con las tres bandas y el punto del puntaje
    **latiendo** (ritmo según el tramo: 1,7 s / 1,25 s / 0,95 s, vía `--beat`; estático con
-   `prefers-reduced-motion`), botón "Ver el método" con brillo al pie del bloque oscuro,
+   `prefers-reduced-motion`). El trazo del ECG se **dibuja en bucle** de izquierda a derecha hasta
+   el puntaje, como una barra de carga (`.dc-trace`: `pathLength="1"` + `stroke-dashoffset` de 1
+   a 0, dura 2,5 latidos, se sostiene y se apaga antes de repetir), botón "Ver el método" con brillo al pie del bloque oscuro,
    diagnóstico del tramo con las tarjetas *mentira* (lavado rojo `--dc-danger`) y *verdad*
    (lavado verde `--dc-success`), recuento de plataformas, CTA al método (`/?dx=<tramo>`) y una
    **barra fija** inferior navy con letras celestes, pulso y botón con brillo. Sin firma final
@@ -109,6 +124,7 @@ Vite las inyecta en tiempo de build, no de ejecución.
 | --- | --- |
 | `VITE_VSL_URL` | Sobreescribe el mp4 del VSL. El default en `offer.js` es el archivo en GHL Media Storage (H.264 720p, faststart, con Range). |
 | `VITE_VSL_POSTER` | Sobreescribe la portada (default `/vsl-poster.jpg`, frame del propio video). |
+| `VITE_OFFER_TIMER_MINUTES` | Minutos de la cuenta regresiva de la oferta (default 10). |
 | `VITE_REVEAL_AT_SECONDS` | Segundo de reproducción en que aparece el botón bajo el video. **Default 0: visible desde el inicio** (decisión del usuario; el retardo se recupera poniendo p. ej. 60). Con retardo, `?cta=1` lo muestra sin memorizar y `?cta=0` borra la memoria. |
 | `VITE_CHECKOUT_URL` | Sobreescribe el checkout. El default es el order form de GHL `B8o92gWnDzyBvBEEF0B4`, embebido en el popup con los atributos del embed oficial y `form_embed.js` (en `index.html`). |
 | `VITE_CTA_URL` | Destino de los CTA del quiz. Default `/` (la landing); el diagnóstico viaja como `?dx=<result_id>`. |

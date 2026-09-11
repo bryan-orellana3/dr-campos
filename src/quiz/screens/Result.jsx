@@ -51,8 +51,10 @@ function ScoreGauge({ score, tone }) {
     <div style={{ width: '100%' }}>
       <svg viewBox="0 0 640 84" fill="none" role="img" aria-label={`Puntaje ${score} de ${SCORE_MAX}`}>
         <path d={`M${X0} ${Y} H${X1}`} stroke="rgba(143,203,239,0.22)" strokeWidth="2" strokeLinecap="round" />
+        {/* El trazo se dibuja de izquierda a derecha hasta el puntaje, como una barra de carga, y vuelve a empezar. */}
         <path
-          className="dc-breathe"
+          className="dc-trace"
+          pathLength="1"
           d={d}
           stroke={accent}
           strokeWidth="2.5"

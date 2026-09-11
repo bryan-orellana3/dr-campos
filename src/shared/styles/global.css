@@ -212,6 +212,20 @@ textarea {
 .dc-beat { animation: dc-beat var(--beat, 1.2s) ease-in-out infinite; }
 .dc-ping { animation: dc-ping var(--beat, 1.2s) ease-out infinite; }
 .dc-breathe { animation: dc-breathe var(--beat, 1.2s) ease-in-out infinite; }
+
+/* Trazo del medidor como barra de carga: con pathLength="1" el dash normalizado se
+   descubre de 1 a 0 (se dibuja), se sostiene y se apaga antes de repetir. Dura el
+   doble y medio del latido, así sigue el ritmo del tramo. */
+@keyframes dc-trace {
+  0% { stroke-dashoffset: 1; opacity: 1; }
+  68% { stroke-dashoffset: 0; opacity: 1; }
+  88% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+.dc-trace {
+  stroke-dasharray: 1;
+  animation: dc-trace calc(var(--beat, 1.2s) * 2.5) linear infinite;
+}
 .dc-glow { animation: dc-glow 2.2s ease-in-out infinite; }
 
 /* Motion — calm and clinical: fades and small translateY only (140–400ms) */

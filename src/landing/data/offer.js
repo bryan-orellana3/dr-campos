@@ -23,7 +23,28 @@ export const CHECKOUT_URL =
 /** Altura que GHL declara para el formulario; su form_embed.js la ajusta al contenido. */
 export const CHECKOUT_HEIGHT = 719;
 
-export const PRICE = { amount: 47, currency: 'USD', label: 'USD 47', note: 'Pago único · acceso inmediato · garantía de 7 días' };
+/** Precio final tras el descuento de lanzamiento: 50% sobre USD 94. */
+export const PRICE = {
+  amount: 47,
+  original: 94,
+  discount: '50%',
+  currency: 'USD',
+  label: 'USD 47',
+  originalLabel: 'USD 94',
+  discountLabel: '50% de descuento',
+  note: 'Pago único · acceso inmediato · garantía de 7 días',
+};
+
+/**
+ * Cuenta regresiva de la oferta exclusiva. Arranca en la primera visita de la sesión y
+ * sobrevive a recargas (sessionStorage); una pestaña nueva la reinicia.
+ */
+export const OFFER_TIMER = {
+  minutes: Number(import.meta.env.VITE_OFFER_TIMER_MINUTES ?? 10),
+  eyebrow: 'Oferta exclusiva · 50% de descuento',
+  label: 'La oferta termina en',
+  expired: 'La oferta está por cerrar',
+};
 
 export const GUARANTEE = {
   title: 'Garantía de 7 días',
@@ -92,12 +113,6 @@ export const MODULES = [
   },
 ];
 
-export const RESOURCES = [
-  'Plantilla de Calendario de Contenidos en Google Sheets',
-  'Templates de temas por especialidad médica',
-  'Checklist de grabación semanal',
-  'Guía de CTAs por plataforma',
-];
 
 export const MENTOR = {
   eyebrow: 'El mentor',
@@ -126,12 +141,3 @@ export const OFFER = {
   cta: 'Quiero el Método 4C',
   finePrint: 'Pago único. Acceso inmediato tras la compra. Garantía de devolución de 7 días.',
 };
-
-export const FAQ = [
-  { q: '¿Necesito equipo o saber editar?', a: 'No. El Dr. Campos empezó con su celular y una luz, sin saber editar. El módulo 3 muestra el material básico y una rutina de producción en lote que cabe en un fin de semana.' },
-  { q: '¿Cuánto tiempo me va a tomar?', a: 'La rutina del método son 30 videos por semana grabados en fin de semana, pero puedes empezar con menos. Lo que importa es que sea constante: el sistema está diseñado para caber en una agenda clínica.' },
-  { q: '¿Cuándo veo resultados?', a: 'El curso es honesto con esto: los primeros 3 meses son para aprender a grabar con constancia; entre los 3 y 6 aparecen patrones y quizá los primeros pacientes; entre los 6 y 12, una base sólida y posible monetización. Al Dr. Campos le tomó dos años cobrar sus primeros 100 dólares.' },
-  { q: '¿Tengo que exponer mi vida privada?', a: 'No. El método se apoya en tu conocimiento médico y en hablar como le hablas a un paciente en consulta. Cercanía no es exposición: es tono.' },
-  { q: '¿Sirve para mi especialidad?', a: 'Sí. La lección 2.1 trabaja el nicho a partir de tu especialidad y viene con templates de temas por especialidad médica.' },
-  { q: '¿Y si no es para mí?', a: 'Tienes 7 días de garantía. Si en la primera semana sientes que el método no es para ti, escribes y te devolvemos el dinero.' },
-];

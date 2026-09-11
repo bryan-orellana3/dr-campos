@@ -4,7 +4,8 @@ import { Badge, BrandLock, Button, Card, PulseDivider, SectionHeading, ArrowRigh
 import { useDocumentTitle } from '../shared/useDocumentTitle.js';
 import VslPlayer, { useCtaReveal } from './VslPlayer.jsx';
 import CheckoutModal from './CheckoutModal.jsx';
-import { DX_LINE, FAQ, GUARANTEE, HERO, MENTOR, MODULES, OFFER, PILLARS, PRICE, PROOF, RESOURCES } from './data/offer.js';
+import { DiscountBadge, OfferCountdown, StrikePrice, useOfferCountdown } from './OfferCountdown.jsx';
+import { DX_LINE, GUARANTEE, HERO, MENTOR, MODULES, OFFER, OFFER_TIMER, PILLARS, PRICE, PROOF } from './data/offer.js';
 
 const label = (onDark) => ({
   font: 'var(--type-label)',
@@ -37,10 +38,10 @@ function Section({ children, dark = false, tight = false, style }) {
   );
 }
 
-function BuyButton({ onClick, variant = 'primary', size = 'lg', children, forwardedRef, style }) {
+function BuyButton({ onClick, variant = 'primary', size = 'lg', children, forwardedRef, className, style }) {
   const isMobile = useIsMobile();
   return (
-    <Button ref={forwardedRef} variant={variant} size={size} onClick={onClick} fullWidth={isMobile} iconAfter={<ArrowRight size={18} />} style={style}>
+    <Button ref={forwardedRef} variant={variant} size={size} onClick={onClick} fullWidth={isMobile} className={className} iconAfter={<ArrowRight size={18} />} style={style}>
       {children}
     </Button>
   );
@@ -57,6 +58,7 @@ export default function LandingPage() {
   const dx = new URLSearchParams(search).get('dx');
   const dxLine = dx && DX_LINE[dx];
   const [revealed, reveal] = useCtaReveal();
+  const countdown = useOfferCountdown();
   const [checkout, setCheckout] = React.useState(false);
   const lastTrigger = React.useRef(null);
   const openCheckout = (e) => {
@@ -98,11 +100,14 @@ export default function LandingPage() {
           </div>
 
           {revealed ? (
-            <div className="dc-rise" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, width: isMobile ? '100%' : 'auto' }}>
+            <div className="dc-rise" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: isMobile ? '100%' : 'auto' }}>
               <BuyButton variant="onDark" onClick={openCheckout}>{HERO.cta}</BuyButton>
-              <span style={{ font: 'var(--type-caption)', color: 'var(--text-muted-on-dark)' }}>
-                {PRICE.label} · {PRICE.note}
+              <span style={{ display: 'inline-flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', columnGap: 8, rowGap: 6, font: 'var(--type-caption)', color: 'var(--text-muted-on-dark)' }}>
+                <StrikePrice size="sm" />
+                <DiscountBadge size="sm" />
+                <span>{PRICE.note}</span>
               </span>
+              <OfferCountdown countdown={countdown} size="lg" />
             </div>
           ) : (
             <PulseDivider onDark width={isMobile ? 200 : 300} />
@@ -196,17 +201,6 @@ export default function LandingPage() {
               </Card>
             ))}
           </div>
-          <Card variant="wash">
-            <span style={label(false)}>Recursos descargables</span>
-            <ul style={{ margin: '12px 0 0', padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 10 }}>
-              {RESOURCES.map((r) => (
-                <li key={r} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', font: 'var(--type-body-sm)', color: 'var(--text-body)' }}>
-                  <Check size={16} style={{ color: 'var(--dc-royal-600)', marginTop: 2 }} />
-                  {r}
-                </li>
-              ))}
-            </ul>
-          </Card>
         </div>
       </Section>
 
@@ -248,35 +242,30 @@ export default function LandingPage() {
               ))}
             </ul>
           </div>
-          <Card variant="dark" padding={isMobile ? 24 : 32} style={{ display: 'flex', flexDirection: 'column', gap: 16, background: 'rgba(2,39,70,0.55)' }}>
-            <span style={label(true)}>Precio</span>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ font: '800 56px/1 var(--font-display)', color: '#fff' }}>{PRICE.amount}</span>
-              <span style={{ font: '700 20px/1 var(--font-display)', color: 'var(--dc-sky-300)' }}>{PRICE.currency}</span>
+          <Card variant="dark" padding={isMobile ? 24 : 32} style={{ display: 'flex', flexDirection: 'column', gap: 16, background: 'rgba(2,39,70,0.55)', border: '1px solid rgba(62,205,232,0.3)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+              <span style={label(true)}>{OFFER_TIMER.eyebrow}</span>
+              <DiscountBadge />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <s style={{ font: '600 20px/1 var(--font-display)', color: 'var(--text-muted-on-dark)', textDecorationColor: 'rgba(255,255,255,0.7)', textDecorationThickness: 2 }}>
+                {PRICE.originalLabel}
+              </s>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+                <span style={{ font: '800 56px/1 var(--font-display)', color: '#fff' }}>{PRICE.amount}</span>
+                <span style={{ font: '700 20px/1 var(--font-display)', color: 'var(--dc-sky-300)' }}>{PRICE.currency}</span>
+                <span style={{ font: '700 14px/1.2 var(--font-display)', color: 'var(--dc-pulse-400)', marginLeft: 4 }}>precio final</span>
+              </div>
             </div>
             <span style={{ font: 'var(--type-body-sm)', color: 'var(--text-muted-on-dark)' }}>{OFFER.finePrint}</span>
+            <OfferCountdown countdown={countdown} size="lg" style={{ alignSelf: 'flex-start' }} />
             <PulseDivider onDark align="left" width={200} />
-            <BuyButton variant="onDark" onClick={openCheckout} style={{ width: '100%' }}>{OFFER.cta}</BuyButton>
+            <BuyButton variant="onDark" className="dc-glow" onClick={openCheckout} style={{ width: '100%' }}>{OFFER.cta}</BuyButton>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
               <span style={{ font: '700 14px/1.3 var(--font-display)', color: 'var(--dc-sky-300)' }}>{GUARANTEE.title}</span>
               <span style={{ font: 'var(--type-body-sm)', color: 'var(--text-muted-on-dark)' }}>{GUARANTEE.text}</span>
             </div>
           </Card>
-        </div>
-      </Section>
-
-      {/* ── FAQ ─────────────────────────────────────────────────────── */}
-      <Section>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 22 : 32, maxWidth: 760 }}>
-          <SectionHeading eyebrow="Preguntas frecuentes" title="Lo que preguntan los médicos antes de entrar" />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {FAQ.map((f) => (
-              <details key={f.q} style={{ background: 'var(--surface-card)', border: '1px solid var(--border-subtle)', borderRadius: 'var(--radius-lg)', padding: '4px 20px' }}>
-                <summary style={{ cursor: 'pointer', font: 'var(--type-h4)', color: 'var(--text-display)', padding: '14px 0' }}>{f.q}</summary>
-                <p style={{ margin: '0 0 16px', font: 'var(--type-body)', color: 'var(--text-body)' }}>{f.a}</p>
-              </details>
-            ))}
-          </div>
         </div>
       </Section>
 
@@ -289,10 +278,10 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* ── Barra fija con el botón de compra, en todas las pantallas ────── */}
+      {/* ── Barra fija: navy, precio tachado, descuento, reloj de la oferta y botón con brillo ── */}
       {revealed && !checkout && (
         <>
-          <div aria-hidden="true" style={{ height: isMobile ? 84 : 92 }} />
+          <div aria-hidden="true" style={{ height: isMobile ? 118 : 96 }} />
           <div
             className="dc-rise"
             style={{
@@ -302,24 +291,43 @@ export default function LandingPage() {
               bottom: 0,
               zIndex: 60,
               padding: isMobile ? '10px 16px calc(10px + env(safe-area-inset-bottom))' : '12px 32px calc(12px + env(safe-area-inset-bottom))',
-              background: 'rgba(246,248,251,0.96)',
+              background: 'rgba(4,26,48,0.96)',
               backdropFilter: 'blur(8px)',
-              borderTop: '1px solid var(--border-subtle)',
+              borderTop: '1px solid rgba(62,205,232,0.35)',
+              color: 'var(--text-on-dark)',
             }}
           >
-            <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                <span style={{ font: '800 18px/1 var(--font-display)', color: 'var(--text-display)', whiteSpace: 'nowrap' }}>
-                  {PRICE.label}
-                </span>
-                <span style={{ font: 'var(--type-caption)', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {isMobile ? 'Pago único · garantía de 7 días' : 'Método 4C · pago único · acceso inmediato · garantía de 7 días'}
-                </span>
+            {isMobile ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                    <StrikePrice size="sm" />
+                    <DiscountBadge size="sm" />
+                  </span>
+                  <OfferCountdown countdown={countdown} size="sm" label={null} style={{ flex: 'none' }} />
+                </div>
+                <Button variant="onDark" size="md" className="dc-glow" fullWidth onClick={openCheckout} iconAfter={<ArrowRight size={16} />}>
+                  {HERO.cta}
+                </Button>
               </div>
-              <Button size={isMobile ? 'md' : 'lg'} onClick={openCheckout} style={{ flex: 'none' }} iconAfter={<ArrowRight size={16} />}>
-                {HERO.cta}
-              </Button>
-            </div>
+            ) : (
+              <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', display: 'flex', alignItems: 'center', gap: 20 }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+                    <StrikePrice size="lg" />
+                    <DiscountBadge />
+                  </span>
+                  <span style={{ font: 'var(--type-caption)', color: 'var(--dc-sky-300)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    Método 4C · pago único · acceso inmediato · garantía de 7 días
+                  </span>
+                </div>
+                {/* El reloj nunca se recorta: cede el ancho la línea de texto de la izquierda. */}
+                <OfferCountdown countdown={countdown} size="sm" label="Termina en" style={{ flex: 'none' }} />
+                <Button variant="onDark" size="lg" className="dc-glow" onClick={openCheckout} style={{ flex: 'none' }} iconAfter={<ArrowRight size={16} />}>
+                  {HERO.cta}
+                </Button>
+              </div>
+            )}
           </div>
         </>
       )}
