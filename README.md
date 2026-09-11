@@ -49,6 +49,9 @@ reproducen. Se convirtió con `avconvert --preset PresetAppleM4V720pHD` a `IMG_9
 
 **Oferta.** USD 47, pago único, garantía de devolución de 7 días. Sin order bump, bonos ni upsell.
 
+**Barra fija.** En todas las pantallas, una barra inferior fija con el precio y "Quiero el Método 4C"
+acompaña toda la página (se oculta mientras el popup está abierto). Sin invitación al quiz al pie.
+
 **Checkout.** El botón de compra abre un popup con el order form de GHL en un iframe. Al enviar, el
 formulario debe estar configurado en GHL con *On Submit → Redirect to URL →*
 `https://dr-david-campos.vercel.app/gracias`: `form_embed.js` aplica esa redirección a la página

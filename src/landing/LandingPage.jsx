@@ -65,14 +65,6 @@ export default function LandingPage() {
   };
   const closeCheckout = React.useCallback(() => setCheckout(false), []);
 
-  // Al quiz viajan los UTM, no los parámetros propios de esta página.
-  const quizHref = (() => {
-    const q = new URLSearchParams(search);
-    q.delete('cta');
-    q.delete('dx');
-    const qs = q.toString();
-    return `/quiz${qs ? `?${qs}` : ''}`;
-  })();
 
   return (
     <div className="dc-fade">
@@ -285,10 +277,6 @@ export default function LandingPage() {
               </details>
             ))}
           </div>
-          <p style={{ margin: 0, font: 'var(--type-body-sm)', color: 'var(--text-muted)' }}>
-            ¿Todavía no sabes en qué punto estás?{' '}
-            <a href={quizHref} style={{ color: 'var(--text-link)' }}>Haz el autodiagnóstico digital</a> — 10 preguntas, 3 minutos.
-          </p>
         </div>
       </Section>
 
@@ -301,33 +289,39 @@ export default function LandingPage() {
         </div>
       </footer>
 
-      {/* ── Barra fija tras el revelado (móvil) ─────────────────────── */}
-      {revealed && isMobile && !checkout && (
-        <div
-          className="dc-rise"
-          style={{
-            position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 60,
-            padding: '10px 16px calc(10px + env(safe-area-inset-bottom))',
-            background: 'rgba(246,248,251,0.96)',
-            backdropFilter: 'blur(8px)',
-            borderTop: '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-            <span style={{ font: '800 18px/1 var(--font-display)', color: 'var(--text-display)' }}>{PRICE.label}</span>
-            <span style={{ font: 'var(--type-caption)', color: 'var(--text-muted)' }}>Pago único</span>
+      {/* ── Barra fija con el botón de compra, en todas las pantallas ────── */}
+      {revealed && !checkout && (
+        <>
+          <div aria-hidden="true" style={{ height: isMobile ? 84 : 92 }} />
+          <div
+            className="dc-rise"
+            style={{
+              position: 'fixed',
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 60,
+              padding: isMobile ? '10px 16px calc(10px + env(safe-area-inset-bottom))' : '12px 32px calc(12px + env(safe-area-inset-bottom))',
+              background: 'rgba(246,248,251,0.96)',
+              backdropFilter: 'blur(8px)',
+              borderTop: '1px solid var(--border-subtle)',
+            }}
+          >
+            <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                <span style={{ font: '800 18px/1 var(--font-display)', color: 'var(--text-display)', whiteSpace: 'nowrap' }}>
+                  {PRICE.label}
+                </span>
+                <span style={{ font: 'var(--type-caption)', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {isMobile ? 'Pago único · garantía de 7 días' : 'Método 4C · pago único · acceso inmediato · garantía de 7 días'}
+                </span>
+              </div>
+              <Button size={isMobile ? 'md' : 'lg'} onClick={openCheckout} style={{ flex: 'none' }} iconAfter={<ArrowRight size={16} />}>
+                {HERO.cta}
+              </Button>
+            </div>
           </div>
-          <Button size="md" onClick={openCheckout} style={{ marginLeft: 'auto' }} iconAfter={<ArrowRight size={16} />}>
-            {HERO.cta}
-          </Button>
-        </div>
+        </>
       )}
 
       <CheckoutModal open={checkout} onClose={closeCheckout} returnFocusTo={lastTrigger} />
