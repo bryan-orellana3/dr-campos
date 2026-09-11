@@ -2,13 +2,27 @@ import React from 'react';
 import { Button, Input, PulseDivider, ArrowLeft, ArrowRight, useIsMobile } from '../../shared/ui.jsx';
 import PhoneField from '../../shared/PhoneField.jsx';
 import { countryByIso, guessCountry } from '../data/countries.js';
-import { CONSENT_TEXT, splitName } from '../data/quiz.js';
+import { CONSENT_TEXT } from '../data/quiz.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
 
-export function validate({ name, email, country, phone, consent }) {
+/* Oculto para la vista, presente para el script: el patrón clásico "visually hidden". */
+const SR_ONLY = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0, 0, 0, 0)',
+  whiteSpace: 'nowrap',
+  border: 0,
+};
+
+export function validate({ firstName, lastName, email, country, phone, consent }) {
   const errors = {};
-  if (name.trim().length < 2) errors.name = 'Escribe tu nombre.';
+  if (firstName.trim().length < 2) errors.firstName = 'Escribe tu nombre.';
+  if (lastName.trim().length < 2) errors.lastName = 'Escribe tu apellido.';
   if (!EMAIL_RE.test(email.trim())) errors.email = 'Revisa tu correo — no parece válido.';
 
   const digits = phone.replace(/\D/g, '');
@@ -25,10 +39,11 @@ export function validate({ name, email, country, phone, consent }) {
  * Captura del lead. Es un <form> real porque el External Tracking de GHL lo detecta en el
  * DOM y, al dispararse el evento submit, se lleva todos sus campos y crea el contacto.
  *
- * Dos reglas que no se pueden romper (ver skill ghl-external-tracking):
- * - Los campos que GHL reconoce se llaman first_name, last_name, email y phone. El nombre
- *   visible es un solo campo, así que first/last salen partidos en inputs hidden; el phone
- *   visible es el número nacional y el hidden `phone` lleva el E.164.
+ * Tres reglas que no se pueden romper (skill ghl-external-tracking, verificado interceptando
+ * la petición del script):
+ * - Los campos que GHL reconoce se llaman first_name, last_name, email y phone, y tienen que
+ *   ser inputs visibles: el script descarta los type="hidden". El phone lleva el E.164.
+ * - El dato rico viaja en inputs de texto readOnly ocultos con CSS, por lo mismo.
  * - El botón es type="button". GHL engancha el clic de cualquier button[type=submit] y envía
  *   el formulario 50 ms después aunque esté vacío. Aquí el submit solo existe si la
  *   validación pasa: sin evento, GHL no ve nada.
@@ -37,7 +52,8 @@ export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {
   const isMobile = useIsMobile();
   const formRef = React.useRef(null);
   const [form, setForm] = React.useState(() => ({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     country: guessCountry(),
     phone: '',
@@ -57,7 +73,9 @@ export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {
   const c = countryByIso(form.country);
   const digits = form.phone.replace(/\D/g, '');
   const phoneE164 = digits ? `+${c.dial}${digits}` : '';
-  const { honorific, first_name, last_name } = splitName(form.name);
+  const extras = Object.entries({ ...hiddenFields, phone_country: c.iso, consent_at: consentAt }).filter(
+    ([, v]) => v !== '' && v != null
+  );
 
   // Solo hay evento submit si la validación pasa: es lo que evita contactos vacíos en GHL.
   const fireSubmit = () => {
@@ -76,7 +94,9 @@ export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {
     e.preventDefault();
     if (Object.keys(validate(form)).length > 0) return;
     onSubmit({
-      name: form.name.trim(),
+      name: `${form.firstName.trim()} ${form.lastName.trim()}`.trim(),
+      firstName: form.firstName.trim(),
+      lastName: form.lastName.trim(),
       email: form.email.trim().toLowerCase(),
       country: c.iso,
       countryName: c.name,
@@ -142,16 +162,26 @@ export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {
         }}
         style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
       >
-        <Input
-          label="Nombre"
-          name="nombre_completo"
-          value={form.name}
-          onChange={(e) => update('name', e.target.value)}
-          error={errors.name}
-          placeholder="Dr. / Dra. …"
-          autoComplete="name"
-          enterKeyHint="next"
-        />
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 12 }}>
+          <Input
+            label="Nombre"
+            name="first_name"
+            value={form.firstName}
+            onChange={(e) => update('firstName', e.target.value)}
+            error={errors.firstName}
+            autoComplete="given-name"
+            enterKeyHint="next"
+          />
+          <Input
+            label="Apellido"
+            name="last_name"
+            value={form.lastName}
+            onChange={(e) => update('lastName', e.target.value)}
+            error={errors.lastName}
+            autoComplete="family-name"
+            enterKeyHint="next"
+          />
+        </div>
 
         <Input
           label="Correo electrónico"
@@ -167,7 +197,7 @@ export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {
         />
 
         <PhoneField
-          name="phone_national"
+          name="phone"
           country={form.country}
           phone={form.phone}
           onCountryChange={(iso) => update('country', iso)}
@@ -214,18 +244,13 @@ export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {
           )}
         </div>
 
-        {/* Contacto en el formato que GHL reconoce, derivado de los campos visibles. */}
-        <input type="hidden" name="first_name" value={first_name} />
-        <input type="hidden" name="last_name" value={last_name} />
-        <input type="hidden" name="phone" value={phoneE164} />
-        <input type="hidden" name="honorific" value={honorific} />
-        <input type="hidden" name="phone_country" value={c.iso} />
-        <input type="hidden" name="phone_dial" value={`+${c.dial}`} />
-        <input type="hidden" name="consent_at" value={consentAt} />
-        {/* Diagnóstico y atribución: el único canal para el dato rico. */}
-        {Object.entries(hiddenFields).map(([k, v]) => (
-          <input key={k} type="hidden" name={k} value={v} />
-        ))}
+        {/* Dato rico y atribución: inputs reales (no hidden) fuera de la vista.
+            El script de GHL descarta type="hidden"; estos sí los serializa. */}
+        <div aria-hidden="true" style={SR_ONLY}>
+          {extras.map(([k, v]) => (
+            <input key={k} type="text" name={k} value={v} readOnly tabIndex={-1} />
+          ))}
+        </div>
 
         <Button
           type="button"

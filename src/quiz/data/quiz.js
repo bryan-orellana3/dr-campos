@@ -346,34 +346,15 @@ export function stepIndexOfQuestion(questionId) {
   return STEPS.findIndex((s) => s.kind === 'question' && s.question.id === questionId);
 }
 
-const HONORIFIC = /^(dr|dra|doctor|doctora|lic|lcda|lcdo|mtro|mtra|ing)\.?\s+/i;
-const HONORIFIC_CANON = {
-  dr: 'Dr.', doctor: 'Dr.', dra: 'Dra.', doctora: 'Dra.',
-  lic: 'Lic.', lcdo: 'Lcdo.', lcda: 'Lcda.', mtro: 'Mtro.', mtra: 'Mtra.', ing: 'Ing.',
-};
 
 /**
- * "Dra. Lucía Herrera" → { honorific: 'Dra.', first_name: 'Lucía', last_name: 'Herrera' }.
- * GHL no llena el nombre del contacto desde un campo `name`: necesita first/last.
- */
-export function splitName(fullName) {
-  const raw = fullName.trim().replace(/\s+/g, ' ');
-  const m = raw.match(HONORIFIC);
-  const honorific = m ? HONORIFIC_CANON[m[1].toLowerCase()] ?? '' : '';
-  const rest = m ? raw.slice(m[0].length) : raw;
-  const [first_name = '', ...tail] = rest.split(' ');
-  return { honorific, first_name, last_name: tail.join(' ') };
-}
-
-/**
- * Campos ocultos del formulario de captura: el dato rico del diagnóstico y la atribución.
- * El External Tracking de GHL solo lleva lo que está dentro del <form>, así que esto es el
- * único canal para el puntaje, el tramo y las respuestas. Llegan como *Unmapped Fields*.
- * Todo son strings: es lo que viaja en un input hidden.
+ * Campos extra del formulario de captura: el dato rico del diagnóstico y la atribución.
+ * El External Tracking de GHL solo lleva lo que hay dentro del <form> y descarta los
+ * type="hidden", así que viajan como inputs de texto readOnly ocultos con CSS. Llegan a GHL
+ * como *Unmapped Fields*. Todo son strings; los vacíos se omiten al renderizar.
  */
 export function buildQuizFields({ answers, otherText, score, result, attribution = {} }) {
   const byId = Object.fromEntries(QUESTIONS.map((q) => [q.id, q]));
-  const label = (qid) => byId[qid]?.options.find((o) => o.value === answers[qid])?.label ?? '';
   const plataformas = (answers.q2 ?? [])
     .map((v) => (v === 'otra' ? otherText.trim() || 'Otra' : byId.q2.options.find((o) => o.value === v)?.label))
     .filter(Boolean);
@@ -390,8 +371,6 @@ export function buildQuizFields({ answers, otherText, score, result, attribution
     plataformas: plataformas.join(', '),
     plataforma_otra: otherText.trim(),
     ...Object.fromEntries(SCORED_QUESTIONS.map((q) => [`${q.id}_valor`, (answers[q.id] ?? '').toUpperCase()])),
-    ...Object.fromEntries(SCORED_QUESTIONS.map((q) => [`${q.id}_respuesta`, label(q.id)])),
-    page_url: typeof window !== 'undefined' ? window.location.href : '',
     ...attribution,
   };
   return Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, v == null ? '' : String(v)]));

@@ -69,20 +69,23 @@ aunque React lo monte después de cargar.
 
 Reglas del formulario (`src/quiz/screens/Capture.jsx`), sacadas del skill `ghl-external-tracking`:
 
-- **Nombres que GHL reconoce**: `first_name`, `last_name`, `email`, `phone`. El nombre visible es
-  un solo campo (`nombre_completo`); `first_name`/`last_name` salen partidos por `splitName()`
-  en inputs hidden. El teléfono visible es el número nacional (`phone_national`); el hidden
-  `phone` lleva el E.164.
+- **Nombres que GHL reconoce**: `first_name`, `last_name`, `email`, `phone` — y tienen que ser
+  inputs **visibles**: interceptando la petición del script se comprobó que **descarta todos los
+  `type="hidden"`** (a diferencia de lo que dice el skill). Por eso el nombre va en dos campos
+  (Nombre / Apellido) y el input del teléfono lleva el E.164 completo con el prefijo fijo
+  (`+591 71234567`), con la bandera en el botón.
 - **El botón es `type="button"`** y solo llama a `requestSubmit()` si la validación pasa. GHL
   engancha el clic de cualquier `button[type=submit]` y envía el formulario 50 ms después
   aunque esté vacío; sin evento `submit`, no ve nada. Enter se replica a mano con el mismo
   camino. Prueba negativa: clic con todo vacío → 4 errores, cero envíos.
 - **Checkbox de consentimiento** (`name="consent"`, obligatorio) dentro del form, con
   `consent_at` en hidden: queda registro y GHL puede tratar al contacto como suscrito.
-- **Dato rico en hidden** (`buildQuizFields()` en `quiz.js`): `score`, `result_id`,
-  `result_stage`, `plataformas`, `q1_valor…q10_valor`, `q*_respuesta`, `tags`, más la
-  atribución persistida por `src/shared/tracking.js` (`utm_*`, `fbclid`, `gclid`, `referrer`,
-  `landing_url`). Llegan a GHL como *Unmapped Fields*, mapeables a custom fields.
+- **Dato rico en inputs de texto `readOnly` ocultos con CSS** (no `hidden`), generados por
+  `buildQuizFields()` en `quiz.js`: `score`, `result_id`, `result_stage`, `plataformas`,
+  `q1_valor…q10_valor`, `tags`, `phone_country`, `consent_at`, más la atribución persistida por
+  `src/shared/tracking.js` (`utm_*`, `fbclid`, `gclid`, `referrer`, `landing_url`). Los vacíos
+  se omiten. Llegan a GHL como *Unmapped Fields*, mapeables a custom fields. El script añade
+  `Timezone` por su cuenta.
 
 Limitación conocida de SPA: el page view solo se registra en la carga inicial; el evento del
 formulario se captura siempre.

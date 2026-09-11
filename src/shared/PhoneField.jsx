@@ -6,10 +6,13 @@ const Flags = { AR, BO, BR, CL, CO, CR, CU, EC, SV, ES, US, GT, GQ, HN, MX, NI, 
 import { COUNTRIES, countryByIso } from '../quiz/data/countries.js';
 
 /**
- * Campo de WhatsApp: selector de país con bandera + número nacional.
+ * Campo de WhatsApp: selector de país con bandera + número en formato internacional.
+ * El input visible lleva el E.164 completo ("+591 71234567") con el prefijo fijo, y se
+ * llama `phone`: el External Tracking de GHL solo serializa inputs visibles, y ese es el
+ * nombre que mapea al teléfono del contacto.
  * Las banderas son SVG (sin emoji: el sistema lo prohíbe y Windows no las dibuja).
  * El selector es un listbox propio y accesible: flechas, Home/End, Enter, Esc,
- * búsqueda por letras, cierre al clicar fuera. El número es un input nativo.
+ * búsqueda por letras, cierre al clicar fuera.
  */
 
 const CHEVRON = (
@@ -36,7 +39,7 @@ function Flag({ iso, size = 22 }) {
   );
 }
 
-export default function PhoneField({ country, phone, onCountryChange, onPhoneChange, error, label = 'WhatsApp', name = 'phone_national' }) {
+export default function PhoneField({ country, phone, onCountryChange, onPhoneChange, error, label = 'WhatsApp', name = 'phone' }) {
   const [open, setOpen] = React.useState(false);
   const [focus, setFocus] = React.useState(false);
   const [active, setActive] = React.useState(() => Math.max(COUNTRIES.findIndex((c) => c.iso === country), 0));
@@ -46,6 +49,17 @@ export default function PhoneField({ country, phone, onCountryChange, onPhoneCha
   const typed = React.useRef({ text: '', at: 0 });
   const id = React.useId();
   const current = countryByIso(country);
+  const prefix = `+${current.dial} `;
+
+  // El valor mostrado es prefijo + número nacional; al escribir se separa el prefijo y
+  // se conservan solo dígitos. Pegar un número con prefijo también funciona.
+  const onInput = (e) => {
+    let v = e.target.value;
+    if (v.startsWith(prefix)) v = v.slice(prefix.length);
+    else if (v.startsWith(`+${current.dial}`)) v = v.slice(current.dial.length + 1);
+    else if (v.startsWith('+')) v = v.replace(/^\+\d*\s?/, '');
+    onPhoneChange(v.replace(/\D/g, '').slice(0, 15));
+  };
 
   // Cierre al clicar fuera y al perder el foco hacia fuera del componente.
   React.useEffect(() => {
@@ -138,7 +152,6 @@ export default function PhoneField({ country, phone, onCountryChange, onPhoneCha
           }}
         >
           <Flag iso={current.iso} />
-          <span style={{ color: 'var(--text-muted)', fontVariantNumeric: 'tabular-nums' }}>+{current.dial}</span>
           <span style={{ color: 'var(--dc-neutral-500)', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform var(--duration-fast) var(--ease-out)', display: 'inline-flex' }}>
             {CHEVRON}
           </span>
@@ -148,12 +161,11 @@ export default function PhoneField({ country, phone, onCountryChange, onPhoneCha
           id={`${id}-num`}
           name={name}
           type="tel"
-          inputMode="numeric"
-          autoComplete="tel-national"
+          inputMode="tel"
+          autoComplete="tel"
           enterKeyHint="done"
-          placeholder="Número"
-          value={phone}
-          onChange={(e) => onPhoneChange(e.target.value)}
+          value={prefix + phone}
+          onChange={onInput}
           onFocus={() => setFocus(true)}
           onBlur={() => setFocus(false)}
           aria-invalid={error ? 'true' : undefined}

@@ -156,7 +156,7 @@ export default function App() {
     setStepIndex(j);
   }, [stage]);
 
-  // Los campos ocultos del formulario: el External Tracking de GHL se los lleva en el submit.
+  // Campos extra del formulario (dato rico + atribución): el External Tracking se los lleva en el submit.
   const quizFields = React.useMemo(
     () => buildQuizFields({ answers, otherText, score, result, attribution: getAttribution() ?? {} }),
     [answers, otherText, score, result]
