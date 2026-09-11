@@ -5,14 +5,15 @@ Una sola app (Vite + React + React Router) con las piezas del funnel, sobre el
 
 | Ruta | Qué es | Estado |
 | --- | --- | --- |
-| `/` | Landing con el VSL | pendiente — hoy redirige a `/quiz` conservando la query |
+| `/` | Landing del VSL — Método 4C | en producción; el video y el checkout se activan por variables (abajo) |
 | `/quiz` | Autodiagnóstico digital para médicos | en producción — `dr-david-campos.vercel.app` (alias histórico: `quiz-riesgo-digital.vercel.app`) |
 
 ```
 design-system/     tokens, assets y componentes de marca — la única fuente de verdad
 src/
 ├── main.jsx       enrutador; cada ruta carga su propio bundle (React.lazy)
-├── shared/        ui.jsx (primitivas del sistema) y styles/global.css
+├── shared/        ui.jsx (primitivas del sistema), PhoneField, tracking.js, styles/global.css
+├── landing/       LandingPage.jsx, VslPlayer.jsx, CheckoutModal.jsx, data/offer.js (config + copy)
 └── quiz/          QuizApp.jsx, data/ y screens/
 ```
 
@@ -23,6 +24,17 @@ pesa 400 KB; la copia servida, 113 KB) — es una optimización deliberada, no d
 Las redirecciones de `main.jsx` conservan `search` y `hash`: un `/?utm_source=…` llega al quiz
 con sus UTM intactos. El `rewrites` de `vercel.json` sirve `index.html` en cualquier ruta para
 que los enlaces profundos (`/quiz`) funcionen al recargar.
+
+## La landing del VSL
+
+Todo el copy y la configuración están en `src/landing/data/offer.js`. El hero es el video: el
+botón de compra aparece al llegar a `REVEAL_AT_SECONDS` y queda visible en visitas posteriores
+(`localStorage`). Al pulsarlo se abre un popup con el checkout de GHL en un iframe. Si la visita
+llega desde el quiz (`?dx=ordinario|debate|climax`), el hero abre con una línea personalizada.
+
+Evidencia: cuatro liquidaciones de Meta (`public/proof-*.jpg`) recortadas por encima de
+"Informações da transação" para no mostrar identificadores ni banco, y dos apariciones en TV.
+Las cifras coinciden con lo que el Dr. Campos dice en la lección 1.3 (3.000–6.000 US$/mes).
 
 ## El quiz
 
@@ -57,7 +69,11 @@ Vite las inyecta en tiempo de build, no de ejecución.
 
 | Variable | Para qué |
 | --- | --- |
-| `VITE_CTA_URL` | Landing de venta. Sin ella los CTA salen deshabilitados con un aviso visible. |
+| `VITE_VSL_URL` | URL directa del mp4 del VSL. Sin ella el hero muestra el hueco reservado. Hospedar fuera del repo. |
+| `VITE_VSL_POSTER` | Imagen de portada del video (opcional). |
+| `VITE_REVEAL_AT_SECONDS` | Segundo de reproducción en que aparece el botón de compra (default 600). `?cta=1` lo muestra sin esperar. |
+| `VITE_CHECKOUT_URL` | Checkout de GHL (payment link u order form) que se embebe en el popup. Sin ella el popup muestra un aviso. |
+| `VITE_CTA_URL` | Destino de los CTA del quiz. Default `/` (la landing); el diagnóstico viaja como `?dx=<result_id>`. |
 
 ## Leads → GoHighLevel (External Tracking)
 
