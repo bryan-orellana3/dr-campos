@@ -60,9 +60,8 @@ reproducen. Se convirtió con `avconvert --preset PresetAppleM4V720pHD` a `IMG_9
 **Barra fija.** En todas las pantallas, una barra inferior fija con el precio y "Quiero el Método 4C"
 acompaña toda la página (se oculta mientras el popup está abierto). Sin invitación al quiz al pie.
 
-**Checkout.** El botón de compra abre un popup con el order form de GHL en un iframe. Al enviar, el
-formulario debe estar configurado en GHL con *On Submit → Redirect to URL →*
-`https://dr-david-campos.vercel.app/gracias`: `form_embed.js` aplica esa redirección a la página
+**Checkout.** El botón de compra abre un popup con el order form de GHL en un iframe. El formulario
+está configurado en GHL con *On Submit → Redirect to URL →* `https://dr-david-campos.vercel.app/gracias`: `form_embed.js` aplica esa redirección a la página
 completa, con lo que el popup desaparece. Como respaldo, `CheckoutModal` escucha `postMessage` del
 origen de GHL y, si el mensaje indica envío, cierra y navega a `/gracias`.
 
@@ -130,9 +129,8 @@ Reglas del formulario (`src/quiz/screens/Capture.jsx`), sacadas del skill `ghl-e
   engancha el clic de cualquier `button[type=submit]` y envía el formulario 50 ms después
   aunque esté vacío; sin evento `submit`, no ve nada. Enter se replica a mano con el mismo
   camino. Prueba negativa: clic con todo vacío → 4 errores, cero envíos.
-- **Sin checkbox de consentimiento** (decisión del usuario): bajo el botón va el aviso "Al pulsar
-  aceptas recibir…"; a GHL viajan `consent_text` (el aviso mostrado) y `consent_at` (hora del
-  envío, escrita en el input justo antes de `requestSubmit()`).
+- **Sin checkbox ni aviso de consentimiento** (decisión del usuario), y por tanto sin campos de
+  consentimiento en el envío: no se registra una aceptación que el médico no vio.
 - **Dato rico en inputs de texto `readOnly` ocultos con CSS** (no `hidden`), generados por
   `buildQuizFields()` en `quiz.js`: `score`, `result_id`, `result_stage`, `plataformas`,
   `q1_valor…q10_valor`, `tags`, `phone_country`, `consent_at`, más la atribución persistida por

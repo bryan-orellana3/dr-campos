@@ -1,8 +1,7 @@
 import React from 'react';
-import { Button, Input, PulseDivider, ArrowLeft, ArrowRight, Lock, useIsMobile } from '../../shared/ui.jsx';
+import { Button, Input, PulseDivider, ArrowLeft, ArrowRight, useIsMobile } from '../../shared/ui.jsx';
 import PhoneField from '../../shared/PhoneField.jsx';
 import { countryByIso, guessCountry } from '../data/countries.js';
-import { CONSENT_TEXT } from '../data/quiz.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
 
@@ -43,8 +42,7 @@ export function validate({ firstName, lastName, email, country, phone }) {
  * - Los campos que GHL reconoce se llaman first_name, last_name, email y phone, y tienen que
  *   ser inputs visibles: el script descarta los type="hidden". El phone lleva el E.164.
  * - El dato rico viaja en inputs de texto readOnly ocultos con CSS, por lo mismo. Sin checkbox
- *   de consentimiento (decisión del usuario): el aviso va bajo el botón y a GHL viajan el texto
- *   mostrado y la hora del envío.
+ *   ni aviso de consentimiento (decisión del usuario), y por tanto sin campos de consentimiento.
  * - El botón es type="button". GHL engancha el clic de cualquier button[type=submit] y envía
  *   el formulario 50 ms después aunque esté vacío. Aquí el submit solo existe si la
  *   validación pasa: sin evento, GHL no ve nada.
@@ -72,9 +70,7 @@ export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {
   const c = countryByIso(form.country);
   const digits = form.phone.replace(/\D/g, '');
   const phoneE164 = digits ? `+${c.dial}${digits}` : '';
-  const extras = Object.entries({ ...hiddenFields, phone_country: c.iso, consent_text: CONSENT_TEXT, consent_at: '' }).filter(
-    ([k, v]) => k === 'consent_at' || (v !== '' && v != null)
-  );
+  const extras = Object.entries({ ...hiddenFields, phone_country: c.iso }).filter(([, v]) => v !== '' && v != null);
 
   // Solo hay evento submit si la validación pasa: es lo que evita contactos vacíos en GHL.
   const fireSubmit = () => {
@@ -84,10 +80,6 @@ export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {
     setTouched(true);
     if (Object.keys(found).length > 0) return;
     const f = formRef.current;
-    // La hora de aceptación se escribe en el DOM justo antes del submit: el script de GHL lee
-    // los campos en ese instante, antes de cualquier re-render.
-    const stamp = f.querySelector('input[name="consent_at"]');
-    if (stamp) stamp.value = new Date().toISOString();
     if (typeof f.requestSubmit === 'function') f.requestSubmit();
     else f.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
   };
@@ -106,7 +98,6 @@ export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {
       dial: c.dial,
       phone: digits,
       phoneE164,
-      consentAt: new Date().toISOString(),
     });
   };
 
@@ -228,10 +219,6 @@ export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {
           {submitting ? 'Preparando tu diagnóstico…' : 'Ver mi diagnóstico'}
         </Button>
 
-        <p style={{ display: 'flex', alignItems: 'flex-start', gap: 8, font: 'var(--type-caption)', color: 'var(--text-muted)', margin: 0 }}>
-          <Lock size={14} style={{ marginTop: 1, flex: 'none' }} />
-          {CONSENT_TEXT}
-        </p>
       </form>
 
       <Button
