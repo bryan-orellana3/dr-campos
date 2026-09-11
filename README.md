@@ -6,7 +6,7 @@ Una sola app (Vite + React + React Router) con las piezas del funnel, sobre el
 | Ruta | Qué es | Estado |
 | --- | --- | --- |
 | `/` | Landing con el VSL | pendiente — hoy redirige a `/quiz` conservando la query |
-| `/quiz` | Autodiagnóstico digital para médicos | en producción |
+| `/quiz` | Autodiagnóstico digital para médicos | en producción — `dr-david-campos.vercel.app` (alias histórico: `quiz-riesgo-digital.vercel.app`) |
 
 ```
 design-system/     tokens, assets y componentes de marca — la única fuente de verdad
@@ -92,7 +92,9 @@ formulario se captura siempre.
 
 **Verificación tras un deploy:** enviar un lead con correo único y comprobar en GHL que hay
 **un** contacto con First Name, Phone y Email llenos, los *Unmapped Fields* presentes y la
-campaña en *Source*; y que un clic con el formulario vacío **no** crea nada.
+campaña en *Source*; y que un clic con el formulario vacío **no** crea nada. Verificado en
+producción el 11 de septiembre de 2026 interceptando el beacon: 30 campos, contacto completo,
+extras y UTM correctos; el envío vacío no dispara nada.
 
 ## Comandos
 
