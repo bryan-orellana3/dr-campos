@@ -16,8 +16,12 @@ export const VSL_POSTER = import.meta.env.VITE_VSL_POSTER || '/vsl-poster.jpg';
  * retardo basta con poner aquí los segundos (p. ej. 60) o definir VITE_REVEAL_AT_SECONDS.
  */
 export const REVEAL_AT_SECONDS = Number(import.meta.env.VITE_REVEAL_AT_SECONDS ?? 0);
-/** Checkout de GHL (payment link u order form) que se abre en el popup. Vacío → aviso. */
-export const CHECKOUT_URL = import.meta.env.VITE_CHECKOUT_URL || '';
+/** Formulario de checkout de GHL (order form) que se embebe en el popup. */
+export const CHECKOUT_FORM_ID = 'B8o92gWnDzyBvBEEF0B4';
+export const CHECKOUT_URL =
+  import.meta.env.VITE_CHECKOUT_URL || `https://api.leadconnectorhq.com/widget/form/${CHECKOUT_FORM_ID}`;
+/** Altura que GHL declara para el formulario; su form_embed.js la ajusta al contenido. */
+export const CHECKOUT_HEIGHT = 719;
 
 export const PRICE = { amount: 47, currency: 'USD', label: 'USD 47', note: 'Pago único · acceso inmediato · garantía de 7 días' };
 

@@ -7,6 +7,7 @@ Una sola app (Vite + React + React Router) con las piezas del funnel, sobre el
 | --- | --- | --- |
 | `/` | Landing del VSL — Método 4C | en producción; el video y el checkout se activan por variables (abajo) |
 | `/quiz` | Autodiagnóstico digital para médicos | en producción — `dr-david-campos.vercel.app` (alias histórico: `quiz-riesgo-digital.vercel.app`) |
+| `/gracias` | Página de gracias tras el checkout | en producción; el formulario de GHL debe redirigir aquí *On Submit* |
 
 ```
 design-system/     tokens, assets y componentes de marca — la única fuente de verdad
@@ -47,6 +48,12 @@ reproducen. Se convirtió con `avconvert --preset PresetAppleM4V720pHD` a `IMG_9
 `VITE_VSL_URL=/vsl.mp4` (ambos ignorados en git).
 
 **Oferta.** USD 47, pago único, garantía de devolución de 7 días. Sin order bump, bonos ni upsell.
+
+**Checkout.** El botón de compra abre un popup con el order form de GHL en un iframe. Al enviar, el
+formulario debe estar configurado en GHL con *On Submit → Redirect to URL →*
+`https://dr-david-campos.vercel.app/gracias`: `form_embed.js` aplica esa redirección a la página
+completa, con lo que el popup desaparece. Como respaldo, `CheckoutModal` escucha `postMessage` del
+origen de GHL y, si el mensaje indica envío, cierra y navega a `/gracias`.
 
 Evidencia: cuatro liquidaciones de Meta (`public/proof-*.jpg`) recortadas por encima de
 "Informações da transação" para no mostrar identificadores ni banco, y dos apariciones en TV.
@@ -90,7 +97,7 @@ Vite las inyecta en tiempo de build, no de ejecución.
 | `VITE_VSL_URL` | Sobreescribe el mp4 del VSL. El default en `offer.js` es el archivo en GHL Media Storage (H.264 720p, faststart, con Range). |
 | `VITE_VSL_POSTER` | Sobreescribe la portada (default `/vsl-poster.jpg`, frame del propio video). |
 | `VITE_REVEAL_AT_SECONDS` | Segundo de reproducción en que aparece el botón bajo el video. **Default 0: visible desde el inicio** (decisión del usuario; el retardo se recupera poniendo p. ej. 60). Con retardo, `?cta=1` lo muestra sin memorizar y `?cta=0` borra la memoria. |
-| `VITE_CHECKOUT_URL` | Checkout de GHL (payment link u order form) que se embebe en el popup. Sin ella el popup muestra un aviso. |
+| `VITE_CHECKOUT_URL` | Sobreescribe el checkout. El default es el order form de GHL `B8o92gWnDzyBvBEEF0B4`, embebido en el popup con los atributos del embed oficial y `form_embed.js` (en `index.html`). |
 | `VITE_CTA_URL` | Destino de los CTA del quiz. Default `/` (la landing); el diagnóstico viaja como `?dx=<result_id>`. |
 
 ## Leads → GoHighLevel (External Tracking)

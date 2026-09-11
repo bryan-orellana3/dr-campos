@@ -9,6 +9,7 @@ captureAttribution();
 // Cada ruta carga su propio bundle: la landing no arrastrará el quiz, ni al revés.
 const LandingPage = React.lazy(() => import('./landing/LandingPage.jsx'));
 const QuizApp = React.lazy(() => import('./quiz/QuizApp.jsx'));
+const ThankYou = React.lazy(() => import('./landing/ThankYou.jsx'));
 
 /** Redirección que conserva la query: los UTM y el fbclid no pueden perderse en el salto. */
 function Redirect({ to }) {
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')).render(
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/quiz" element={<QuizApp />} />
+          <Route path="/gracias" element={<ThankYou />} />
           <Route path="*" element={<Redirect to="/" />} />
         </Routes>
       </React.Suspense>
