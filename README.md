@@ -172,10 +172,13 @@ apilado — orbe arriba — y no sirve de cabecera), teñida por CSS con `mask-i
 92 px de alto: si marca entrega el "Dr" aislado en SVG, se sustituye el archivo y queda vectorial.
 En los textos corridos se escribe "Dr." tipográfico; el trazo es solo para el lockup.
 
-`public/isotipo.webp` se recortó del retrato original ajustando la circunferencia del disco
-(centro y radio) para que la foto llene el círculo sin margen muerto; lleva máscara alfa con
-2 px de sangrado interior para que no asome el fondo claro en el borde. `favicon.png` sale
-del mismo recorte.
+`public/isotipo.webp` es el retrato oficial completo — el disco azul con el arco y el pelo
+sobresaliendo por arriba — con fondo transparente. La máscara se construyó por geometría: el
+disco real se ajustó por mínimos cuadrados al borde izquierdo de la foto (centro ≈ (614, 672),
+radio ≈ 515; el borde superior del pelo engaña, sobresale ~80 px del disco); dentro del disco se
+conserva todo (bata blanca incluida) y fuera solo lo que no es fondo claro (arco y pelo). Se dibuja
+sin recorte circular. Del mismo archivo salen `favicon-32.png`, `favicon.png` (192) y
+`apple-touch-icon.png` (180), enlazados en las tres cabeceras.
 
 Las fuentes son las sustituciones de Google Fonts del sistema (Montserrat, Source Sans 3,
 Sacramento en lugar de Brittany Signature). Si se licencian las originales, se reemplazan

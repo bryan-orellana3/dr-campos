@@ -203,12 +203,12 @@ export function BrandLock({ onDark = false, size = 48, style }) {
         alt=""
         aria-hidden="true"
         style={{
-          width: size,
-          height: size,
-          borderRadius: '50%',
-          objectFit: 'cover',
+          // El isotipo trae su propia forma (disco con el arco); se dibuja entero, sin recorte.
+          width: size * 1.1,
+          height: size * 1.1,
+          objectFit: 'contain',
           flex: 'none',
-          boxShadow: '0 0 0 2px rgba(143,203,239,0.35)',
+          marginTop: -size * 0.05,
         }}
       />
       <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: size * 0.1 }}>
