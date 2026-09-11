@@ -44,21 +44,27 @@ function ScoreGauge({ score, tone }) {
       : `M${X0} ${Y} H${mx}`;
 
   const accent = TONE[tone].dark;
+  // El ritmo del latido cuenta el puntaje: débil y lento en la consulta silenciosa, vivo en el alta.
+  const beat = { danger: '1.7s', warning: '1.25s', success: '0.95s' }[tone];
 
   return (
     <div style={{ width: '100%' }}>
       <svg viewBox="0 0 640 84" fill="none" role="img" aria-label={`Puntaje ${score} de ${SCORE_MAX}`}>
         <path d={`M${X0} ${Y} H${X1}`} stroke="rgba(143,203,239,0.22)" strokeWidth="2" strokeLinecap="round" />
         <path
+          className="dc-breathe"
           d={d}
           stroke={accent}
           strokeWidth="2.5"
           strokeLinejoin="round"
           strokeLinecap="round"
-          style={{ filter: `drop-shadow(0 0 8px ${accent}66)` }}
+          style={{ filter: `drop-shadow(0 0 8px ${accent}66)`, '--beat': beat }}
         />
-        <circle cx={mx} cy={Y} r="7" fill={accent} style={{ filter: `drop-shadow(0 0 10px ${accent}99)` }} />
-        <circle cx={mx} cy={Y} r="12" fill="none" stroke={accent} strokeOpacity="0.35" strokeWidth="1.5" />
+        <g style={{ '--beat': beat }}>
+          <circle className="dc-ping" cx={mx} cy={Y} r="12" fill="none" stroke={accent} strokeWidth="2" />
+          <circle className="dc-ping" cx={mx} cy={Y} r="12" fill="none" stroke={accent} strokeWidth="1.5" style={{ animationDelay: `calc(var(--beat) / 2)` }} />
+          <circle className="dc-beat" cx={mx} cy={Y} r="7" fill={accent} style={{ filter: `drop-shadow(0 0 10px ${accent}99)` }} />
+        </g>
 
         {BANDS.map((b) => {
           const from = toX(b.min - 0.5);
@@ -122,7 +128,7 @@ export default function Result({ score, result, answers, otherText, leadName }) 
     padding: isMobile ? '0 20px' : '0 32px',
   };
 
-  const CtaButton = ({ children, variant = 'primary', size = 'lg', onDark = false }) =>
+  const CtaButton = ({ children, variant = 'primary', size = 'lg', onDark = false, glow = false }) =>
     ctaDisabled ? (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start' }}>
         <Button variant={variant} size={size} fullWidth={isMobile} iconAfter={<ArrowRight size={18} />} disabled>
@@ -139,7 +145,7 @@ export default function Result({ score, result, answers, otherText, leadName }) 
       </div>
     ) : (
       <a href={ctaHref} style={{ textDecoration: 'none', display: isMobile ? 'block' : 'inline-block' }}>
-        <Button variant={variant} size={size} fullWidth={isMobile} iconAfter={<ArrowRight size={18} />}>
+        <Button variant={variant} size={size} fullWidth={isMobile} iconAfter={<ArrowRight size={18} />} className={glow ? 'dc-glow' : ''}>
           {children}
         </Button>
       </a>
@@ -223,6 +229,12 @@ export default function Result({ score, result, answers, otherText, leadName }) 
               {result.lede}
             </p>
           </div>
+
+          <div style={{ marginTop: isMobile ? 6 : 10 }}>
+            <CtaButton variant="onDark" size="lg" onDark glow>
+              Ver el método
+            </CtaButton>
+          </div>
         </div>
       </section>
 
@@ -273,13 +285,13 @@ export default function Result({ score, result, answers, otherText, leadName }) 
               gap: 14,
             }}
           >
-            <Card>
+            <Card style={{ background: 'rgba(192,69,62,0.10)', border: '1px solid rgba(192,69,62,0.35)', boxShadow: 'none' }}>
               <span
                 style={{
                   font: 'var(--type-label)',
                   letterSpacing: 'var(--tracking-label)',
                   textTransform: 'uppercase',
-                  color: accent.light,
+                  color: 'var(--dc-danger)',
                 }}
               >
                 {result.contrast.lieLabel}
@@ -292,13 +304,13 @@ export default function Result({ score, result, answers, otherText, leadName }) 
               </p>
             </Card>
 
-            <Card>
+            <Card style={{ background: 'rgba(30,138,94,0.10)', border: '1px solid rgba(30,138,94,0.35)', boxShadow: 'none' }}>
               <span
                 style={{
                   font: 'var(--type-label)',
                   letterSpacing: 'var(--tracking-label)',
                   textTransform: 'uppercase',
-                  color: 'var(--dc-royal-600)',
+                  color: 'var(--dc-success)',
                 }}
               >
                 {result.contrast.truthLabel}
@@ -407,14 +419,11 @@ export default function Result({ score, result, answers, otherText, leadName }) 
           <div style={{ marginTop: 4 }}>
             <CtaButton>{CLOSING.cta}</CtaButton>
           </div>
-          <span style={{ font: '400 34px/1.2 var(--font-script)', color: 'var(--dc-royal-600)' }}>
-            Dr. David Campos
-          </span>
 
         </div>
       </section>
 
-      {/* Barra fija: la invitación al método acompaña todo el diagnóstico desde el inicio. */}
+      {/* Barra fija: navy, celeste como "CAMPOS", con el pulso y el botón que brilla. */}
       {!ctaDisabled && (
         <div
           className="dc-rise"
@@ -425,72 +434,23 @@ export default function Result({ score, result, answers, otherText, leadName }) 
             bottom: 0,
             zIndex: 60,
             padding: isMobile ? '10px 16px calc(10px + env(safe-area-inset-bottom))' : '12px 32px calc(12px + env(safe-area-inset-bottom))',
-            background: 'rgba(246,248,251,0.96)',
+            background: 'rgba(4,26,48,0.94)',
             backdropFilter: 'blur(8px)',
-            borderTop: '1px solid var(--border-subtle)',
+            borderTop: '1px solid var(--border-on-dark)',
           }}
         >
-          <div
-            style={{
-              maxWidth: 720,
-              margin: '0 auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              <span style={{ font: '700 14px/1.2 var(--font-display)', color: 'var(--text-display)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div style={{ maxWidth: 720, margin: '0 auto', display: 'flex', alignItems: 'center', gap: isMobile ? 12 : 18 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+              <span style={{ font: isMobile ? '800 15px/1.2 var(--font-display)' : '800 17px/1.2 var(--font-display)', color: 'var(--dc-sky-300)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {isMobile ? 'Tu tratamiento existe' : 'Tu tratamiento existe: el Método 4C'}
               </span>
-              <span style={{ font: 'var(--type-caption)', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ font: 'var(--type-caption)', color: 'var(--text-muted-on-dark)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {isMobile ? 'Del Dr. David Campos' : '16 lecciones · el sistema documentado del Dr. David Campos'}
               </span>
             </div>
+            {!isMobile && <PulseDivider onDark width={140} style={{ flex: 'none' }} />}
             <a href={ctaHref} style={{ textDecoration: 'none', flex: 'none' }}>
-              <Button size="md" iconAfter={<ArrowRight size={16} />}>Ver el método</Button>
-            </a>
-          </div>
-        </div>
-      )}
-
-      {/* Barra fija: la invitación al método acompaña todo el diagnóstico desde el inicio. */}
-      {!ctaDisabled && (
-        <div
-          className="dc-rise"
-          style={{
-            position: 'fixed',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 60,
-            padding: isMobile ? '10px 16px calc(10px + env(safe-area-inset-bottom))' : '12px 32px calc(12px + env(safe-area-inset-bottom))',
-            background: 'rgba(246,248,251,0.96)',
-            backdropFilter: 'blur(8px)',
-            borderTop: '1px solid var(--border-subtle)',
-          }}
-        >
-          <div
-            style={{
-              maxWidth: 720,
-              margin: '0 auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: 12,
-            }}
-          >
-            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              <span style={{ font: '700 14px/1.2 var(--font-display)', color: 'var(--text-display)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {isMobile ? 'Tu tratamiento existe' : 'Tu tratamiento existe: el Método 4C'}
-              </span>
-              <span style={{ font: 'var(--type-caption)', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {isMobile ? 'Del Dr. David Campos' : '16 lecciones · el sistema documentado del Dr. David Campos'}
-              </span>
-            </div>
-            <a href={ctaHref} style={{ textDecoration: 'none', flex: 'none' }}>
-              <Button size="md" iconAfter={<ArrowRight size={16} />}>Ver el método</Button>
+              <Button variant="onDark" size={isMobile ? 'md' : 'lg'} className="dc-glow" iconAfter={<ArrowRight size={16} />}>Ver el método</Button>
             </a>
           </div>
         </div>

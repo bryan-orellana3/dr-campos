@@ -84,10 +84,13 @@ Las cifras coinciden con lo que el Dr. Campos dice en la lección 1.3 (3.000–6
    - Volver atrás desde una pregunta **se salta el dato intermedio** — se vuelve para
      cambiar la respuesta, no para releer.
 3. **Captura** — nombre, email y WhatsApp con selector de país (el país se adivina por zona horaria).
-4. **Resultado** — puntaje sobre 27, medidor ECG con las tres bandas, diagnóstico completo
-   del tramo, recuento de plataformas declaradas, los CTA al método (`/?dx=<tramo>`) y una
-   **barra fija** inferior con "Ver el método" visible desde el primer momento. Sin opción de
-   repetir el test.
+4. **Resultado** — puntaje sobre 27, medidor ECG con las tres bandas y el punto del puntaje
+   **latiendo** (ritmo según el tramo: 1,7 s / 1,25 s / 0,95 s, vía `--beat`; estático con
+   `prefers-reduced-motion`), botón "Ver el método" con brillo al pie del bloque oscuro,
+   diagnóstico del tramo con las tarjetas *mentira* (lavado rojo `--dc-danger`) y *verdad*
+   (lavado verde `--dc-success`), recuento de plataformas, CTA al método (`/?dx=<tramo>`) y una
+   **barra fija** inferior navy con letras celestes, pulso y botón con brillo. Sin firma final
+   ni opción de repetir el test.
 
 Puntaje: 9 preguntas puntuadas × (A=1, B=2, C=3) → 9 a 27.
 Tramos: 9–14 consulta silenciosa · 15–21 el debate · 22–27 camino al alta médica.
