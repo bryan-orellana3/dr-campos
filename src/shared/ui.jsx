@@ -25,7 +25,7 @@ export const useIsMobile = () => useMediaQuery('(max-width: 720px)');
  * Los estados viven en `global.css` (`.dc-btn`) para que el hover no se quede
  * pegado en dispositivos táctiles.
  */
-export function Button({
+export const Button = React.forwardRef(function Button({
   variant = 'primary',
   size = 'md',
   disabled = false,
@@ -38,9 +38,10 @@ export function Button({
   onClick,
   style,
   ...rest
-}) {
+}, ref) {
   return (
     <button
+      ref={ref}
       type={type}
       onClick={onClick}
       disabled={disabled}
@@ -53,7 +54,7 @@ export function Button({
       {iconAfter}
     </button>
   );
-}
+});
 
 /** Superficie tipo tarjeta. Variantes: default | wash | dark. */
 export function Card({ variant = 'default', padding = 24, children, style, ...rest }) {

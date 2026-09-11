@@ -2,11 +2,10 @@
 // Casing en oración y sin emoji, según las reglas del sistema de diseño.
 
 /**
- * URL de la landing de venta. Todos los CTA del quiz apuntan aquí.
- * Cámbiala en este único lugar cuando la landing esté publicada,
- * o define VITE_CTA_URL en las variables de entorno de Vercel.
+ * Destino de los CTA del resultado: la landing del VSL, en la raíz de esta misma app.
+ * VITE_CTA_URL lo sobreescribe si algún día la venta vive en otro dominio.
  */
-export const CTA_URL = import.meta.env.VITE_CTA_URL || '#';
+export const CTA_URL = import.meta.env.VITE_CTA_URL || '/';
 
 /** Texto del checkbox de consentimiento. Viaja a GHL con el formulario como evidencia. */
 export const CONSENT_TEXT =

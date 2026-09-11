@@ -7,6 +7,7 @@ import { captureAttribution } from './shared/tracking.js';
 captureAttribution();
 
 // Cada ruta carga su propio bundle: la landing no arrastrará el quiz, ni al revés.
+const LandingPage = React.lazy(() => import('./landing/LandingPage.jsx'));
 const QuizApp = React.lazy(() => import('./quiz/QuizApp.jsx'));
 
 /** Redirección que conserva la query: los UTM y el fbclid no pueden perderse en el salto. */
@@ -20,9 +21,7 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <React.Suspense fallback={null}>
         <Routes>
-          {/* Aquí vivirá la landing con el VSL. Hasta que exista, la raíz manda al quiz
-              para que ningún enlace ya publicado deje de funcionar. */}
-          <Route path="/" element={<Redirect to="/quiz" />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/quiz" element={<QuizApp />} />
           <Route path="*" element={<Redirect to="/" />} />
         </Routes>

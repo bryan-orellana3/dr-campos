@@ -111,8 +111,9 @@ export default function Result({ score, result, answers, otherText, leadName, on
   const isMobile = useIsMobile();
   const platforms = platformSummary(answers, otherText);
   const accent = TONE[result.tone];
-  const ctaHref = CTA_URL;
-  const ctaDisabled = ctaHref === '#';
+  // El diagnóstico viaja en la query para que la landing pueda personalizar su apertura.
+  const ctaHref = CTA_URL === '#' ? '#' : `${CTA_URL}${CTA_URL.includes('?') ? '&' : '?'}dx=${result.id}`;
+  const ctaDisabled = CTA_URL === '#';
 
   const wrap = {
     width: '100%',
