@@ -43,6 +43,12 @@ const PlayIcon = () => (
 export default function VslPlayer({ onReveal, revealed }) {
   const video = React.useRef(null);
   const [started, setStarted] = React.useState(false);
+  // La proporción la dicta el archivo (el VSL viene en 3:2, no 16:9): ni recorte ni bandas.
+  const [aspect, setAspect] = React.useState('16 / 9');
+  const onMeta = () => {
+    const v = video.current;
+    if (v?.videoWidth && v?.videoHeight) setAspect(`${v.videoWidth} / ${v.videoHeight}`);
+  };
 
   const onTime = () => {
     if (!revealed && video.current && video.current.currentTime >= REVEAL_AT_SECONDS) onReveal();
@@ -56,7 +62,7 @@ export default function VslPlayer({ onReveal, revealed }) {
   const frame = {
     position: 'relative',
     width: '100%',
-    aspectRatio: '16 / 9',
+    aspectRatio: aspect,
     borderRadius: 'var(--radius-xl)',
     overflow: 'hidden',
     background: 'var(--dc-navy-950)',
@@ -91,8 +97,9 @@ export default function VslPlayer({ onReveal, revealed }) {
         controls={started}
         controlsList="nodownload"
         onTimeUpdate={onTime}
+        onLoadedMetadata={onMeta}
         onPlay={() => setStarted(true)}
-        style={{ width: '100%', height: '100%', display: 'block', objectFit: 'cover', background: '#000' }}
+        style={{ width: '100%', height: '100%', display: 'block', objectFit: 'contain', background: '#000' }}
       />
       {!started && (
         <button

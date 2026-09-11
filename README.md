@@ -32,6 +32,16 @@ botón de compra aparece al llegar a `REVEAL_AT_SECONDS` y queda visible en visi
 (`localStorage`). Al pulsarlo se abre un popup con el checkout de GHL en un iframe. Si la visita
 llega desde el quiz (`?dx=ordinario|debate|climax`), el hero abre con una línea personalizada.
 
+**Video.** El original (`Drive/Dr Campos/VSL/IMG_9199.MOV`) viene en HEVC, que Chrome y Android no
+reproducen. Se convirtió con `avconvert --preset PresetAppleM4V720pHD` a `IMG_9199-web-720p.mp4`
+(H.264, 1080×720, 81 MB), dejado en la misma carpeta de Drive para subirlo a un host de video
+(GHL Media Storage o Bunny Stream). Ni Drive ni Vercel sirven para alojarlo. La portada
+(`public/vsl-poster.jpg`) salió del propio video. El reproductor toma la proporción real del archivo
+(3:2) desde los metadatos. Para probar en local: `public/vsl.mp4` + `.env.local` con
+`VITE_VSL_URL=/vsl.mp4` (ambos ignorados en git).
+
+**Oferta.** USD 47, pago único, garantía de devolución de 7 días. Sin order bump, bonos ni upsell.
+
 Evidencia: cuatro liquidaciones de Meta (`public/proof-*.jpg`) recortadas por encima de
 "Informações da transação" para no mostrar identificadores ni banco, y dos apariciones en TV.
 Las cifras coinciden con lo que el Dr. Campos dice en la lección 1.3 (3.000–6.000 US$/mes).
@@ -71,7 +81,7 @@ Vite las inyecta en tiempo de build, no de ejecución.
 | --- | --- |
 | `VITE_VSL_URL` | URL directa del mp4 del VSL. Sin ella el hero muestra el hueco reservado. Hospedar fuera del repo. |
 | `VITE_VSL_POSTER` | Imagen de portada del video (opcional). |
-| `VITE_REVEAL_AT_SECONDS` | Segundo de reproducción en que aparece el botón de compra (default 600). `?cta=1` lo muestra sin esperar. |
+| `VITE_REVEAL_AT_SECONDS` | Segundo de reproducción en que aparece el botón bajo el video (default 60). El botón del bloque de oferta está siempre visible. `?cta=1` lo muestra sin esperar. |
 | `VITE_CHECKOUT_URL` | Checkout de GHL (payment link u order form) que se embebe en el popup. Sin ella el popup muestra un aviso. |
 | `VITE_CTA_URL` | Destino de los CTA del quiz. Default `/` (la landing); el diagnóstico viaja como `?dx=<result_id>`. |
 

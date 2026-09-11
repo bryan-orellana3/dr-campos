@@ -4,7 +4,7 @@ import { Badge, BrandLock, Button, Card, PulseDivider, SectionHeading, ArrowRigh
 import { useDocumentTitle } from '../shared/useDocumentTitle.js';
 import VslPlayer, { useCtaReveal } from './VslPlayer.jsx';
 import CheckoutModal from './CheckoutModal.jsx';
-import { DX_LINE, FAQ, HERO, MENTOR, MODULES, OFFER, PILLARS, PRICE, PROOF, RESOURCES, TIMELINE } from './data/offer.js';
+import { DX_LINE, FAQ, GUARANTEE, HERO, MENTOR, MODULES, OFFER, PILLARS, PRICE, PROOF, RESOURCES } from './data/offer.js';
 
 const label = (onDark) => ({
   font: 'var(--type-label)',
@@ -240,21 +240,6 @@ export default function LandingPage() {
         </div>
       </Section>
 
-      {/* ── Expectativas ────────────────────────────────────────────── */}
-      <Section>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? 26 : 40 }}>
-          <SectionHeading eyebrow={TIMELINE.eyebrow} title={TIMELINE.title} lede={TIMELINE.lede} />
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: 18 }}>
-            {TIMELINE.steps.map((s) => (
-              <Card key={s.when}>
-                <span style={label(false)}>{s.when}</span>
-                <p style={{ margin: '10px 0 0', font: 'var(--type-body)', color: 'var(--text-display)' }}>{s.what}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </Section>
-
       {/* ── Oferta ──────────────────────────────────────────────────── */}
       <Section dark>
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr', gap: isMobile ? 28 : 56, alignItems: 'center' }}>
@@ -278,13 +263,11 @@ export default function LandingPage() {
             </div>
             <span style={{ font: 'var(--type-body-sm)', color: 'var(--text-muted-on-dark)' }}>{OFFER.finePrint}</span>
             <PulseDivider onDark align="left" width={200} />
-            {revealed ? (
-              <BuyButton variant="onDark" onClick={openCheckout} style={{ width: '100%' }}>{OFFER.cta}</BuyButton>
-            ) : (
-              <span style={{ font: 'var(--type-body-sm)', color: 'var(--text-muted-on-dark)' }}>
-                El acceso se habilita al ver el video del método. Vuelve arriba y dale play.
-              </span>
-            )}
+            <BuyButton variant="onDark" onClick={openCheckout} style={{ width: '100%' }}>{OFFER.cta}</BuyButton>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <span style={{ font: '700 14px/1.3 var(--font-display)', color: 'var(--dc-sky-300)' }}>{GUARANTEE.title}</span>
+              <span style={{ font: 'var(--type-body-sm)', color: 'var(--text-muted-on-dark)' }}>{GUARANTEE.text}</span>
+            </div>
           </Card>
         </div>
       </Section>

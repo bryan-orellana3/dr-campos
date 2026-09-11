@@ -9,11 +9,16 @@ export const VSL_URL = import.meta.env.VITE_VSL_URL || '';
 /** Imagen de portada del video (frame). Opcional. */
 export const VSL_POSTER = import.meta.env.VITE_VSL_POSTER || '';
 /** Segundo de reproducción en el que aparece el botón de compra. */
-export const REVEAL_AT_SECONDS = Number(import.meta.env.VITE_REVEAL_AT_SECONDS || 600);
+export const REVEAL_AT_SECONDS = Number(import.meta.env.VITE_REVEAL_AT_SECONDS || 60);
 /** Checkout de GHL (payment link u order form) que se abre en el popup. Vacío → aviso. */
 export const CHECKOUT_URL = import.meta.env.VITE_CHECKOUT_URL || '';
 
-export const PRICE = { amount: 47, currency: 'USD', label: 'USD 47', note: 'Pago único · acceso inmediato' };
+export const PRICE = { amount: 47, currency: 'USD', label: 'USD 47', note: 'Pago único · acceso inmediato · garantía de 7 días' };
+
+export const GUARANTEE = {
+  title: 'Garantía de 7 días',
+  text: 'Si en la primera semana sientes que el método no es para ti, escribes y te devolvemos el dinero. Sin formularios ni explicaciones.',
+};
 
 export const HERO = {
   eyebrow: 'Método 4C · para médicos',
@@ -97,17 +102,6 @@ export const MENTOR = {
   ],
 };
 
-export const TIMELINE = {
-  eyebrow: 'Expectativas realistas',
-  title: 'Qué puedes esperar si eres constante',
-  lede: 'Nadie llega rápido, y quien espera hacerlo abandona. Esta es la línea de tiempo que el Dr. Campos enseña en la lección 1.4 — la misma que vivió.',
-  steps: [
-    { when: 'Meses 1 a 3', what: 'Aprendes a grabar con constancia y encuentras tu estilo.' },
-    { when: 'Meses 3 a 6', what: 'Ves patrones en lo que funciona y, posiblemente, llegan los primeros pacientes.' },
-    { when: 'Meses 6 a 12', what: 'Base sólida, posible monetización y una rutina establecida.' },
-  ],
-};
-
 export const OFFER = {
   eyebrow: 'Acceso al método',
   title: 'Método 4C — Presencia digital para médicos',
@@ -120,7 +114,7 @@ export const OFFER = {
     'Guía de CTAs por plataforma',
   ],
   cta: 'Quiero el Método 4C',
-  finePrint: 'Pago único. Acceso inmediato tras la compra.',
+  finePrint: 'Pago único. Acceso inmediato tras la compra. Garantía de devolución de 7 días.',
 };
 
 export const FAQ = [
@@ -129,4 +123,5 @@ export const FAQ = [
   { q: '¿Cuándo veo resultados?', a: 'El curso es honesto con esto: los primeros 3 meses son para aprender a grabar con constancia; entre los 3 y 6 aparecen patrones y quizá los primeros pacientes; entre los 6 y 12, una base sólida y posible monetización. Al Dr. Campos le tomó dos años cobrar sus primeros 100 dólares.' },
   { q: '¿Tengo que exponer mi vida privada?', a: 'No. El método se apoya en tu conocimiento médico y en hablar como le hablas a un paciente en consulta. Cercanía no es exposición: es tono.' },
   { q: '¿Sirve para mi especialidad?', a: 'Sí. La lección 2.1 trabaja el nicho a partir de tu especialidad y viene con templates de temas por especialidad médica.' },
+  { q: '¿Y si no es para mí?', a: 'Tienes 7 días de garantía. Si en la primera semana sientes que el método no es para ti, escribes y te devolvemos el dinero.' },
 ];
