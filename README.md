@@ -27,9 +27,10 @@ que los enlaces profundos (`/quiz`) funcionen al recargar.
 
 ## La landing del VSL
 
-Todo el copy y la configuración están en `src/landing/data/offer.js`. El hero es el video: el
-botón de compra aparece al llegar a `REVEAL_AT_SECONDS` y queda visible en visitas posteriores
-(`localStorage`). Al pulsarlo se abre un popup con el checkout de GHL en un iframe. Si la visita
+Todo el copy y la configuración están en `src/landing/data/offer.js`. El hero es el video y va
+primero, antes del título: el botón de compra aparece justo debajo al llegar a `REVEAL_AT_SECONDS`
+de **reproducción** (no de reloj; saltar más adelante también lo revela) y queda visible en visitas
+posteriores (`localStorage`). Al pulsarlo se abre un popup con el checkout de GHL en un iframe. Si la visita
 llega desde el quiz (`?dx=ordinario|debate|climax`), el hero abre con una línea personalizada.
 
 **Video.** El original (`Drive/Dr Campos/VSL/IMG_9199.MOV`) viene en HEVC, que Chrome y Android no
@@ -79,9 +80,9 @@ Vite las inyecta en tiempo de build, no de ejecución.
 
 | Variable | Para qué |
 | --- | --- |
-| `VITE_VSL_URL` | URL directa del mp4 del VSL. Sin ella el hero muestra el hueco reservado. Hospedar fuera del repo. |
-| `VITE_VSL_POSTER` | Imagen de portada del video (opcional). |
-| `VITE_REVEAL_AT_SECONDS` | Segundo de reproducción en que aparece el botón bajo el video (default 60). El botón del bloque de oferta está siempre visible. `?cta=1` lo muestra sin esperar. |
+| `VITE_VSL_URL` | Sobreescribe el mp4 del VSL. El default en `offer.js` es el archivo en GHL Media Storage (H.264 720p, faststart, con Range). |
+| `VITE_VSL_POSTER` | Sobreescribe la portada (default `/vsl-poster.jpg`, frame del propio video). |
+| `VITE_REVEAL_AT_SECONDS` | Segundo de reproducción en que aparece el botón bajo el video (default 60). El botón del bloque de oferta está siempre visible. `?cta=1` lo muestra sin memorizar; `?cta=0` borra la memoria del navegador. |
 | `VITE_CHECKOUT_URL` | Checkout de GHL (payment link u order form) que se embebe en el popup. Sin ella el popup muestra un aviso. |
 | `VITE_CTA_URL` | Destino de los CTA del quiz. Default `/` (la landing); el diagnóstico viaja como `?dx=<result_id>`. |
 

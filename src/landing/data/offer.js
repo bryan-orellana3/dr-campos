@@ -4,10 +4,12 @@
  * pendientes se pueden fijar por variable de entorno (VITE_*) sin tocar código.
  */
 
-/** URL directa del mp4 del VSL. Vacía → el reproductor muestra el hueco reservado. */
-export const VSL_URL = import.meta.env.VITE_VSL_URL || '';
-/** Imagen de portada del video (frame). Opcional. */
-export const VSL_POSTER = import.meta.env.VITE_VSL_POSTER || '';
+/** mp4 del VSL, hospedado en GHL Media Storage (H.264 720p, convertido desde el original HEVC). */
+export const VSL_URL =
+  import.meta.env.VITE_VSL_URL ||
+  'https://assets.cdn.filesafe.space/JcY02EUFgsn63RSQqI5G/media/6aa36626240171435ef693b4.mp4';
+/** Portada del video: frame extraído del propio VSL. */
+export const VSL_POSTER = import.meta.env.VITE_VSL_POSTER || '/vsl-poster.jpg';
 /** Segundo de reproducción en el que aparece el botón de compra. */
 export const REVEAL_AT_SECONDS = Number(import.meta.env.VITE_REVEAL_AT_SECONDS || 60);
 /** Checkout de GHL (payment link u order form) que se abre en el popup. Vacío → aviso. */

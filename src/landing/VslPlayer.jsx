@@ -6,13 +6,16 @@ const REVEALED_KEY = 'dc-vsl-cta-revealed';
 
 /**
  * Devuelve true cuando el botón de compra debe estar visible: al llegar al segundo
- * configurado de reproducción, o si ya se llegó en una visita anterior (persistido),
- * o con ?cta=1 para revisar la página sin esperar.
+ * configurado de reproducción, o si ya se llegó en una visita anterior (persistido).
+ * Para revisar: ?cta=1 lo muestra sin memorizarlo; ?cta=0 borra la memoria y deja ver
+ * el comportamiento real desde cero.
  */
 export function useCtaReveal() {
   const [revealed, setRevealed] = React.useState(() => {
     try {
-      if (new URLSearchParams(window.location.search).get('cta') === '1') return true;
+      const cta = new URLSearchParams(window.location.search).get('cta');
+      if (cta === '0') window.localStorage.removeItem(REVEALED_KEY);
+      if (cta === '1') return true;
       return window.localStorage.getItem(REVEALED_KEY) === '1';
     } catch {
       return false;

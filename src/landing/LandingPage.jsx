@@ -100,24 +100,7 @@ export default function LandingPage() {
             </span>
           )}
 
-          <Badge tone="pulse" style={{ background: 'rgba(62,205,232,0.16)', color: 'var(--dc-pulse-400)' }}>{HERO.eyebrow}</Badge>
-
-          <h1
-            style={{
-              font: isMobile ? '800 30px/1.14 var(--font-display)' : '800 46px/1.1 var(--font-display)',
-              letterSpacing: 'var(--tracking-display)',
-              color: '#fff',
-              margin: 0,
-              maxWidth: '22ch',
-            }}
-          >
-            {HERO.title}
-          </h1>
-
-          <p style={{ font: isMobile ? 'var(--type-body)' : 'var(--type-body-lg)', color: 'var(--text-muted-on-dark)', margin: 0, maxWidth: '62ch' }}>
-            {HERO.lede}
-          </p>
-
+          {/* El video es lo primero que se ve; el botón aparece justo debajo al llegar al segundo configurado. */}
           <div style={{ width: '100%', maxWidth: 900 }}>
             <VslPlayer onReveal={reveal} revealed={revealed} />
           </div>
@@ -132,6 +115,24 @@ export default function LandingPage() {
           ) : (
             <PulseDivider onDark width={isMobile ? 200 : 300} />
           )}
+
+          <Badge tone="pulse" style={{ background: 'rgba(62,205,232,0.16)', color: 'var(--dc-pulse-400)' }}>{HERO.eyebrow}</Badge>
+
+          <h1
+            style={{
+              font: isMobile ? '800 28px/1.14 var(--font-display)' : '800 40px/1.1 var(--font-display)',
+              letterSpacing: 'var(--tracking-display)',
+              color: '#fff',
+              margin: 0,
+              maxWidth: '24ch',
+            }}
+          >
+            {HERO.title}
+          </h1>
+
+          <p style={{ font: isMobile ? 'var(--type-body)' : 'var(--type-body-lg)', color: 'var(--text-muted-on-dark)', margin: 0, maxWidth: '62ch' }}>
+            {HERO.lede}
+          </p>
         </div>
       </section>
 
