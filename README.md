@@ -18,6 +18,14 @@ src/
 └── quiz/          QuizApp.jsx, data/ y screens/
 ```
 
+**Un HTML por ruta pública.** `index.html` (landing), `quiz.html` y `gracias.html` cargan el mismo
+bundle pero llevan su propio `<title>`, descripción y `og:*` — los rastreadores de WhatsApp,
+Facebook o LinkedIn no ejecutan JavaScript, así que la previsualización sale de la cabecera
+estática. Vite los compila como entradas múltiples y `vercel.json` reescribe `/quiz` y `/gracias`
+a su HTML. La imagen de previsualización es `public/og-dr-campos.jpg` (1200×630, 94 KB: WhatsApp
+no muestra la imagen grande por encima de ~300 KB), referenciada con URL absoluta. WhatsApp cachea
+la previsualización por URL: para forzar la nueva en un enlace ya compartido, añadir `?v=2`.
+
 Los tokens no se copian: `src/shared/styles/global.css` importa `design-system/styles.css`.
 Las imágenes de `public/` sí son copias optimizadas de `design-system/assets/` (el logo master
 pesa 400 KB; la copia servida, 113 KB) — es una optimización deliberada, no duplicación.

@@ -3,7 +3,11 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/quiz", "destination": "/quiz.html" },
+    { "source": "/gracias", "destination": "/gracias.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/assets/(.*)",
