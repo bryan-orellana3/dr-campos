@@ -28,9 +28,13 @@ que los enlaces profundos (`/quiz`) funcionen al recargar.
 ## La landing del VSL
 
 Todo el copy y la configuración están en `src/landing/data/offer.js`. El hero es el video y va
-primero, antes del título: el botón de compra aparece justo debajo al llegar a `REVEAL_AT_SECONDS`
-de **reproducción** (no de reloj; saltar más adelante también lo revela) y queda visible en visitas
-posteriores (`localStorage`). Al pulsarlo se abre un popup con el checkout de GHL en un iframe. Si la visita
+primero, antes del título. El reproductor (`VslPlayer.jsx`) no tiene controles de reproducción:
+arranca solo y en silencio (autoplay muted) con el aviso "Tu video ya empezó. Toca para activar el
+sonido"; al tocar vuelve al inicio con sonido; el único control es el altavoz (tocar el video
+también silencia/activa); sin play, pausa ni barra; al terminar ofrece "Ver de nuevo". Si el
+navegador bloquea el autoplay, el aviso pasa a "Toca para ver el video". El botón de compra aparece
+justo debajo al llegar a `REVEAL_AT_SECONDS` de **posición del video** (con o sin sonido; saltar
+más adelante también lo revela) y queda visible en visitas posteriores (`localStorage`). Al pulsarlo se abre un popup con el checkout de GHL en un iframe. Si la visita
 llega desde el quiz (`?dx=ordinario|debate|climax`), el hero abre con una línea personalizada.
 
 **Video.** El original (`Drive/Dr Campos/VSL/IMG_9199.MOV`) viene en HEVC, que Chrome y Android no
