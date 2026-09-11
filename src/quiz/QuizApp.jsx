@@ -5,10 +5,10 @@ import Dato from './screens/Dato.jsx';
 import Capture from './screens/Capture.jsx';
 import Result from './screens/Result.jsx';
 import { BrandLock, useIsMobile } from '../shared/ui.jsx';
-import { LEAD_WEBHOOK, QUESTIONS, STEPS, buildLeadPayload, computeScore, resultForScore } from './data/quiz.js';
+import { QUESTIONS, STEPS, buildQuizFields, computeScore, resultForScore } from './data/quiz.js';
+import { getAttribution } from '../shared/tracking.js';
 
 const STORAGE_KEY = 'dc-quiz-riesgo-digital-v2';
-const PENDING_KEY = 'dc-quiz-lead-pendiente';
 
 /* ── persistencia ligera: un refresh no debe borrar el avance ───────── */
 
@@ -34,14 +34,6 @@ function saveState(state) {
   } catch {
     /* modo privado o cuota llena — el quiz sigue funcionando en memoria */
   }
-}
-
-/* ── atribución de campaña ─────────────────────────────────────────── */
-
-function campaignParams() {
-  const params = new URLSearchParams(window.location.search);
-  const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'gclid'];
-  return Object.fromEntries(keys.map((k) => [k, params.get(k)]).filter(([, v]) => v));
 }
 
 /* ── barra de progreso: la línea de pulso como avance ──────────────── */
@@ -164,46 +156,17 @@ export default function App() {
     setStepIndex(j);
   }, [stage]);
 
-  const submitLead = async (data) => {
+  // Los campos ocultos del formulario: el External Tracking de GHL se los lleva en el submit.
+  const quizFields = React.useMemo(
+    () => buildQuizFields({ answers, otherText, score, result, attribution: getAttribution() ?? {} }),
+    [answers, otherText, score, result]
+  );
+
+  // El envío a GHL lo hace el script de External Tracking al capturar el submit del form;
+  // aquí solo queda guardar el lead y pasar al diagnóstico.
+  const submitLead = (data) => {
     setSubmitting(true);
-    const payload = buildLeadPayload({
-      lead: data,
-      answers,
-      otherText,
-      score,
-      result,
-      attribution: campaignParams(),
-    });
-
-    if (LEAD_WEBHOOK) {
-      // Tiempo límite: un GHL lento nunca deja al médico mirando "Preparando…".
-      const abort = new AbortController();
-      const timer = window.setTimeout(() => abort.abort(), 8000);
-      try {
-        const res = await fetch(LEAD_WEBHOOK, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-          keepalive: true,
-          signal: abort.signal,
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      } catch (err) {
-        // El lead nunca bloquea el diagnóstico: se guarda localmente para recuperarlo después.
-        try {
-          const pending = JSON.parse(window.localStorage.getItem(PENDING_KEY) || '[]');
-          pending.push(payload);
-          window.localStorage.setItem(PENDING_KEY, JSON.stringify(pending));
-        } catch {
-          /* sin almacenamiento disponible */
-        }
-        console.warn('No se pudo enviar el lead al webhook:', err);
-      } finally {
-        window.clearTimeout(timer);
-      }
-    }
-
-    setLead(payload);
+    setLead(data);
     setSubmitting(false);
     setStage('result');
   };
@@ -241,7 +204,7 @@ export default function App() {
       <Header progress={progress} onDark={onDark} />
       <main>
         {isCapture ? (
-          <Capture onSubmit={submitLead} submitting={submitting} onBack={back} />
+          <Capture onSubmit={submitLead} submitting={submitting} onBack={back} hiddenFields={quizFields} />
         ) : step.kind === 'dato' ? (
           <Dato
             key={step.question.id}

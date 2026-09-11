@@ -58,28 +58,38 @@ Vite las inyecta en tiempo de build, no de ejecución.
 | Variable | Para qué |
 | --- | --- |
 | `VITE_CTA_URL` | Landing de venta. Sin ella los CTA salen deshabilitados con un aviso visible. |
-| `VITE_LEAD_WEBHOOK` | Sobreescribe el inbound webhook de GHL (el de producción va por defecto en `quiz.js`). |
 
-## Leads → GoHighLevel
+## Leads → GoHighLevel (External Tracking)
 
-El formulario de captura envía un POST JSON al **inbound webhook** de GHL (`LEAD_WEBHOOK` en
-`src/quiz/data/quiz.js`). El payload lo arma `buildLeadPayload()`: plano, en `snake_case` y
-con valores escalares, para mapearlo campo a campo en el workflow sin transformar nada.
+La captura no llama a ninguna API propia: el script **External Tracking** de GHL (en
+`index.html`, antes de `</body>`, con el `data-tracking-id` de la cuenta) detecta el `<form>`
+de captura y, al dispararse su evento `submit`, envía todos los campos a GHL, que crea o
+actualiza el contacto y le liga la atribución de la sesión. Verificado: engancha el formulario
+aunque React lo monte después de cargar.
 
-- Contacto con los nombres que GHL reconoce: `first_name`, `last_name` (el nombre se parte
-  con `splitName()`, que separa tratamientos como *Dra.*), `email`, `phone` en E.164.
-- Diagnóstico: `score`, `result_id`, `result_stage`, `plataformas`, `q1_valor…q10_valor`,
-  `q1_respuesta…`, y `tags` (`quiz-riesgo-digital`, `resultado-<id>`).
-- Consentimiento (`consent`, `consent_text`, `consent_at`) y atribución (`utm_*`, `fbclid`,
-  `gclid`, `referrer`, `page_url`).
+Reglas del formulario (`src/quiz/screens/Capture.jsx`), sacadas del skill `ghl-external-tracking`:
 
-El envío tiene **tiempo límite de 8 s**. Si GHL falla o no responde, el diagnóstico se muestra
-igual y el lead queda en `localStorage` bajo `dc-quiz-lead-pendiente` — nadie se queda sin su
-resultado por un fallo de red.
+- **Nombres que GHL reconoce**: `first_name`, `last_name`, `email`, `phone`. El nombre visible es
+  un solo campo (`nombre_completo`); `first_name`/`last_name` salen partidos por `splitName()`
+  en inputs hidden. El teléfono visible es el número nacional (`phone_national`); el hidden
+  `phone` lleva el E.164.
+- **El botón es `type="button"`** y solo llama a `requestSubmit()` si la validación pasa. GHL
+  engancha el clic de cualquier `button[type=submit]` y envía el formulario 50 ms después
+  aunque esté vacío; sin evento `submit`, no ve nada. Enter se replica a mano con el mismo
+  camino. Prueba negativa: clic con todo vacío → 4 errores, cero envíos.
+- **Checkbox de consentimiento** (`name="consent"`, obligatorio) dentro del form, con
+  `consent_at` en hidden: queda registro y GHL puede tratar al contacto como suscrito.
+- **Dato rico en hidden** (`buildQuizFields()` en `quiz.js`): `score`, `result_id`,
+  `result_stage`, `plataformas`, `q1_valor…q10_valor`, `q*_respuesta`, `tags`, más la
+  atribución persistida por `src/shared/tracking.js` (`utm_*`, `fbclid`, `gclid`, `referrer`,
+  `landing_url`). Llegan a GHL como *Unmapped Fields*, mapeables a custom fields.
 
-El selector de país del WhatsApp (`src/shared/PhoneField.jsx`) es un listbox accesible con
-banderas SVG de `country-flag-icons` — se importan solo las 23 de la lista; un `import *`
-arrastra las 260 del paquete.
+Limitación conocida de SPA: el page view solo se registra en la carga inicial; el evento del
+formulario se captura siempre.
+
+**Verificación tras un deploy:** enviar un lead con correo único y comprobar en GHL que hay
+**un** contacto con First Name, Phone y Email llenos, los *Unmapped Fields* presentes y la
+campaña en *Source*; y que un clic con el formulario vacío **no** crea nada.
 
 ## Comandos
 

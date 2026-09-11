@@ -36,7 +36,7 @@ function Flag({ iso, size = 22 }) {
   );
 }
 
-export default function PhoneField({ country, phone, onCountryChange, onPhoneChange, error, label = 'WhatsApp' }) {
+export default function PhoneField({ country, phone, onCountryChange, onPhoneChange, error, label = 'WhatsApp', name = 'phone_national' }) {
   const [open, setOpen] = React.useState(false);
   const [focus, setFocus] = React.useState(false);
   const [active, setActive] = React.useState(() => Math.max(COUNTRIES.findIndex((c) => c.iso === country), 0));
@@ -146,6 +146,7 @@ export default function PhoneField({ country, phone, onCountryChange, onPhoneCha
 
         <input
           id={`${id}-num`}
+          name={name}
           type="tel"
           inputMode="numeric"
           autoComplete="tel-national"

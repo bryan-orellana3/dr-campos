@@ -2,6 +2,9 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import './shared/styles/global.css';
+import { captureAttribution } from './shared/tracking.js';
+
+captureAttribution();
 
 // Cada ruta carga su propio bundle: la landing no arrastrará el quiz, ni al revés.
 const QuizApp = React.lazy(() => import('./quiz/QuizApp.jsx'));

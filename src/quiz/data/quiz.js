@@ -8,18 +8,9 @@
  */
 export const CTA_URL = import.meta.env.VITE_CTA_URL || '#';
 
-/**
- * Inbound webhook de GoHighLevel que recibe cada lead.
- * VITE_LEAD_WEBHOOK lo sobreescribe (p. ej. para apuntar a un workflow de pruebas).
- * Si el envío falla, el diagnóstico se muestra igual y el lead queda en localStorage.
- */
-export const LEAD_WEBHOOK =
-  import.meta.env.VITE_LEAD_WEBHOOK ||
-  'https://services.leadconnectorhq.com/hooks/JcY02EUFgsn63RSQqI5G/webhook-trigger/174a6b8d-20fa-46c2-a362-c4a5ae57178a';
-
-/** Texto exacto que el médico acepta al pulsar el botón. Viaja en el payload como evidencia. */
+/** Texto del checkbox de consentimiento. Viaja a GHL con el formulario como evidencia. */
 export const CONSENT_TEXT =
-  'Al pulsar aceptas recibir tu diagnóstico y el material del método por WhatsApp y correo. Sin spam; puedes darte de baja cuando quieras.';
+  'Acepto recibir mi diagnóstico y el material del método por WhatsApp y correo. Sin spam; puedo darme de baja cuando quiera.';
 
 export const QUESTIONS = [
   {
@@ -375,50 +366,33 @@ export function splitName(fullName) {
 }
 
 /**
- * Payload plano para el inbound webhook de GHL. Claves en snake_case y valores escalares:
- * así cada una se mapea a un campo del contacto sin transformar nada en el workflow.
+ * Campos ocultos del formulario de captura: el dato rico del diagnóstico y la atribución.
+ * El External Tracking de GHL solo lleva lo que está dentro del <form>, así que esto es el
+ * único canal para el puntaje, el tramo y las respuestas. Llegan como *Unmapped Fields*.
+ * Todo son strings: es lo que viaja en un input hidden.
  */
-export function buildLeadPayload({ lead, answers, otherText, score, result, attribution }) {
-  const { honorific, first_name, last_name } = splitName(lead.name);
+export function buildQuizFields({ answers, otherText, score, result, attribution = {} }) {
   const byId = Object.fromEntries(QUESTIONS.map((q) => [q.id, q]));
   const label = (qid) => byId[qid]?.options.find((o) => o.value === answers[qid])?.label ?? '';
   const plataformas = (answers.q2 ?? [])
     .map((v) => (v === 'otra' ? otherText.trim() || 'Otra' : byId.q2.options.find((o) => o.value === v)?.label))
     .filter(Boolean);
 
-  return {
-    // — contacto (nombres que GHL reconoce) —
-    first_name,
-    last_name,
-    full_name: lead.name,
-    honorific,
-    email: lead.email,
-    phone: lead.phoneE164,
-    phone_country: lead.country,
-    phone_country_name: lead.countryName,
-    phone_dial: `+${lead.dial}`,
-    phone_national: lead.phone,
-    // — diagnóstico —
+  const fields = {
     source: 'Quiz riesgo digital',
     quiz: 'riesgo-digital',
-    score,
-    score_max: SCORE_MAX,
+    score: String(score),
+    score_max: String(SCORE_MAX),
     result_id: result.id,
     result_stage: result.stage,
     result_title: result.title,
-    tags: ['quiz-riesgo-digital', `resultado-${result.id}`],
+    tags: `quiz-riesgo-digital, resultado-${result.id}`,
     plataformas: plataformas.join(', '),
     plataforma_otra: otherText.trim(),
-    ...Object.fromEntries(SCORED_QUESTIONS.map((q) => [`${q.id}_respuesta`, label(q.id)])),
     ...Object.fromEntries(SCORED_QUESTIONS.map((q) => [`${q.id}_valor`, (answers[q.id] ?? '').toUpperCase()])),
-    // — consentimiento y atribución —
-    consent: true,
-    consent_text: CONSENT_TEXT,
-    consent_at: new Date().toISOString(),
-    submitted_at: new Date().toISOString(),
-    page_url: window.location.href,
-    referrer: document.referrer || '',
-    user_agent: navigator.userAgent,
+    ...Object.fromEntries(SCORED_QUESTIONS.map((q) => [`${q.id}_respuesta`, label(q.id)])),
+    page_url: typeof window !== 'undefined' ? window.location.href : '',
     ...attribution,
   };
+  return Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, v == null ? '' : String(v)]));
 }

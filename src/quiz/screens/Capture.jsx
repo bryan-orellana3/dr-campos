@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button, Input, PulseDivider, ArrowLeft, ArrowRight, Lock, useIsMobile } from '../../shared/ui.jsx';
+import { Button, Input, PulseDivider, ArrowLeft, ArrowRight, useIsMobile } from '../../shared/ui.jsx';
 import PhoneField from '../../shared/PhoneField.jsx';
 import { countryByIso, guessCountry } from '../data/countries.js';
-import { CONSENT_TEXT } from '../data/quiz.js';
+import { CONSENT_TEXT, splitName } from '../data/quiz.js';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
 
-export function validate({ name, email, country, phone }) {
+export function validate({ name, email, country, phone, consent }) {
   const errors = {};
   if (name.trim().length < 2) errors.name = 'Escribe tu nombre.';
   if (!EMAIL_RE.test(email.trim())) errors.email = 'Revisa tu correo — no parece válido.';
@@ -17,45 +17,73 @@ export function validate({ name, email, country, phone }) {
   else if (digits.length < Math.min(...c.len) || digits.length > Math.max(...c.len) + 1) {
     errors.phone = `Un número de ${c.name} tiene ${c.len.join(' o ')} dígitos.`;
   }
+  if (!consent) errors.consent = 'Necesitamos tu aceptación para enviarte el diagnóstico.';
   return errors;
 }
 
-export default function Capture({ onSubmit, submitting, submitError, onBack }) {
+/**
+ * Captura del lead. Es un <form> real porque el External Tracking de GHL lo detecta en el
+ * DOM y, al dispararse el evento submit, se lleva todos sus campos y crea el contacto.
+ *
+ * Dos reglas que no se pueden romper (ver skill ghl-external-tracking):
+ * - Los campos que GHL reconoce se llaman first_name, last_name, email y phone. El nombre
+ *   visible es un solo campo, así que first/last salen partidos en inputs hidden; el phone
+ *   visible es el número nacional y el hidden `phone` lleva el E.164.
+ * - El botón es type="button". GHL engancha el clic de cualquier button[type=submit] y envía
+ *   el formulario 50 ms después aunque esté vacío. Aquí el submit solo existe si la
+ *   validación pasa: sin evento, GHL no ve nada.
+ */
+export default function Capture({ onSubmit, submitting, onBack, hiddenFields = {} }) {
   const isMobile = useIsMobile();
+  const formRef = React.useRef(null);
   const [form, setForm] = React.useState(() => ({
     name: '',
     email: '',
     country: guessCountry(),
     phone: '',
+    consent: false,
   }));
+  const [consentAt, setConsentAt] = React.useState('');
   const [errors, setErrors] = React.useState({});
   const [touched, setTouched] = React.useState(false);
 
-  const set = (key) => (e) => {
-    const value = e.target.value;
+  const update = (key, value) =>
     setForm((f) => {
       const next = { ...f, [key]: value };
       if (touched) setErrors(validate(next));
       return next;
     });
-  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const c = countryByIso(form.country);
+  const digits = form.phone.replace(/\D/g, '');
+  const phoneE164 = digits ? `+${c.dial}${digits}` : '';
+  const { honorific, first_name, last_name } = splitName(form.name);
+
+  // Solo hay evento submit si la validación pasa: es lo que evita contactos vacíos en GHL.
+  const fireSubmit = () => {
+    if (submitting) return;
     const found = validate(form);
     setErrors(found);
     setTouched(true);
     if (Object.keys(found).length > 0) return;
+    const f = formRef.current;
+    if (typeof f.requestSubmit === 'function') f.requestSubmit();
+    else f.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  };
 
-    const c = countryByIso(form.country);
+  // Este es el evento que GHL captura (fase capture sobre el form) con los campos ya llenos.
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (Object.keys(validate(form)).length > 0) return;
     onSubmit({
       name: form.name.trim(),
       email: form.email.trim().toLowerCase(),
       country: c.iso,
       countryName: c.name,
       dial: c.dial,
-      phone: form.phone.replace(/\D/g, ''),
-      phoneE164: `+${c.dial}${form.phone.replace(/\D/g, '')}`,
+      phone: digits,
+      phoneE164,
+      consentAt,
     });
   };
 
@@ -100,11 +128,25 @@ export default function Capture({ onSubmit, submitting, submitError, onBack }) {
         </p>
       </header>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }} noValidate>
+      <form
+        ref={formRef}
+        id="lead-form"
+        onSubmit={handleSubmit}
+        noValidate
+        onKeyDown={(e) => {
+          // Sin botón submit no hay envío implícito con Enter: se replica a mano, validando.
+          if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+            e.preventDefault();
+            fireSubmit();
+          }
+        }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+      >
         <Input
           label="Nombre"
+          name="nombre_completo"
           value={form.name}
-          onChange={set('name')}
+          onChange={(e) => update('name', e.target.value)}
           error={errors.name}
           placeholder="Dr. / Dra. …"
           autoComplete="name"
@@ -113,9 +155,10 @@ export default function Capture({ onSubmit, submitting, submitError, onBack }) {
 
         <Input
           label="Correo electrónico"
+          name="email"
           type="email"
           value={form.email}
-          onChange={set('email')}
+          onChange={(e) => update('email', e.target.value)}
           error={errors.email}
           placeholder="tu@correo.com"
           autoComplete="email"
@@ -124,37 +167,77 @@ export default function Capture({ onSubmit, submitting, submitError, onBack }) {
         />
 
         <PhoneField
+          name="phone_national"
           country={form.country}
           phone={form.phone}
-          onCountryChange={(iso) => set('country')({ target: { value: iso } })}
-          onPhoneChange={(v) => set('phone')({ target: { value: v } })}
+          onCountryChange={(iso) => update('country', iso)}
+          onPhoneChange={(v) => update('phone', v)}
           error={errors.phone}
         />
 
-        {submitError && (
-          <p style={{ font: 'var(--type-body-sm)', color: 'var(--dc-danger)', margin: 0 }}>
-            {submitError}
-          </p>
-        )}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 10,
+              cursor: 'pointer',
+              font: 'var(--type-body-sm)',
+              color: 'var(--text-body)',
+            }}
+          >
+            <input
+              type="checkbox"
+              name="consent"
+              required
+              checked={form.consent}
+              onChange={(e) => {
+                update('consent', e.target.checked);
+                setConsentAt(e.target.checked ? new Date().toISOString() : '');
+              }}
+              aria-invalid={errors.consent ? 'true' : undefined}
+              style={{
+                width: 20,
+                height: 20,
+                margin: '1px 0 0',
+                flex: 'none',
+                accentColor: 'var(--accent-primary)',
+                cursor: 'pointer',
+              }}
+            />
+            <span>{CONSENT_TEXT}</span>
+          </label>
+          {errors.consent && (
+            <span style={{ font: 'var(--type-caption)', color: 'var(--dc-danger)', paddingLeft: 30 }}>
+              {errors.consent}
+            </span>
+          )}
+        </div>
 
-        <Button type="submit" size="lg" fullWidth disabled={submitting} iconAfter={<ArrowRight size={18} />}>
+        {/* Contacto en el formato que GHL reconoce, derivado de los campos visibles. */}
+        <input type="hidden" name="first_name" value={first_name} />
+        <input type="hidden" name="last_name" value={last_name} />
+        <input type="hidden" name="phone" value={phoneE164} />
+        <input type="hidden" name="honorific" value={honorific} />
+        <input type="hidden" name="phone_country" value={c.iso} />
+        <input type="hidden" name="phone_dial" value={`+${c.dial}`} />
+        <input type="hidden" name="consent_at" value={consentAt} />
+        {/* Diagnóstico y atribución: el único canal para el dato rico. */}
+        {Object.entries(hiddenFields).map(([k, v]) => (
+          <input key={k} type="hidden" name={k} value={v} />
+        ))}
+
+        <Button
+          type="button"
+          size="lg"
+          fullWidth
+          disabled={submitting}
+          onClick={fireSubmit}
+          iconAfter={<ArrowRight size={18} />}
+          style={{ marginTop: 4 }}
+        >
           {submitting ? 'Preparando tu diagnóstico…' : 'Ver mi diagnóstico'}
         </Button>
-
-        <p
-          style={{
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 8,
-            font: 'var(--type-caption)',
-            color: 'var(--text-muted)',
-            margin: 0,
-          }}
-        >
-          <Lock size={14} style={{ marginTop: 1, flex: 'none' }} />
-          Tus datos son sólo para enviarte el diagnóstico y el material del método. Nada de spam, y
-          puedes darte de baja cuando quieras.
-        </p>
       </form>
 
       <Button
