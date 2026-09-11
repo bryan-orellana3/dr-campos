@@ -123,3 +123,14 @@ del mismo recorte.
 Las fuentes son las sustituciones de Google Fonts del sistema (Montserrat, Source Sans 3,
 Sacramento en lugar de Brittany Signature). Si se licencian las originales, se reemplazan
 en `design-system/tokens/fonts.css`.
+
+## Despliegue
+
+Proyecto Vercel `dr-david-campos` (equipo *Bryan Orellana's projects*, plan **Hobby**), enlazado
+al repo `bryan-orellana3/dr-campos`. En Hobby, Vercel **bloquea** cualquier deploy cuyo commit
+no esté firmado por el GitHub conectado a la cuenta (`bryan-orellana3`): sale como *Blocked* y
+solo pasa con *Authorize* a mano. Por eso los commits se firman como Bryan (`git config` local
+del repo) — mira al autor del commit desplegado, no al historial.
+
+- Con permiso de escritura en el repo de Bryan, cada `git push` a `main` despliega solo.
+- Sin él, `vercel --prod` desde este directorio publica igual (la regla mira al autor del commit).
