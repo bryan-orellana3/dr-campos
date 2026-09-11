@@ -171,13 +171,6 @@ export default function App() {
     setStage('result');
   };
 
-  const restart = () => {
-    setAnswers({});
-    setOtherText('');
-    setStepIndex(0);
-    setLead(null);
-    setStage('intro');
-  };
 
   if (stage === 'intro') return <Intro onStart={start} />;
 
@@ -189,7 +182,6 @@ export default function App() {
         answers={answers}
         otherText={otherText}
         leadName={lead?.name}
-        onRestart={restart}
       />
     );
   }

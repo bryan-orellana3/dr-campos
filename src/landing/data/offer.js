@@ -10,8 +10,12 @@ export const VSL_URL =
   'https://assets.cdn.filesafe.space/JcY02EUFgsn63RSQqI5G/media/6aa36626240171435ef693b4.mp4';
 /** Portada del video: frame extraído del propio VSL. */
 export const VSL_POSTER = import.meta.env.VITE_VSL_POSTER || '/vsl-poster.jpg';
-/** Segundo de reproducción en el que aparece el botón de compra. */
-export const REVEAL_AT_SECONDS = Number(import.meta.env.VITE_REVEAL_AT_SECONDS || 60);
+/**
+ * Segundo de reproducción en el que aparece el botón bajo el video.
+ * 0 = visible desde el inicio (decisión del usuario, 11 sep 2026). Para recuperar el
+ * retardo basta con poner aquí los segundos (p. ej. 60) o definir VITE_REVEAL_AT_SECONDS.
+ */
+export const REVEAL_AT_SECONDS = Number(import.meta.env.VITE_REVEAL_AT_SECONDS ?? 0);
 /** Checkout de GHL (payment link u order form) que se abre en el popup. Vacío → aviso. */
 export const CHECKOUT_URL = import.meta.env.VITE_CHECKOUT_URL || '';
 

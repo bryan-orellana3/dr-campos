@@ -32,9 +32,10 @@ primero, antes del título. El reproductor (`VslPlayer.jsx`) no tiene controles 
 arranca solo y en silencio (autoplay muted) con el aviso "Tu video ya empezó. Toca para activar el
 sonido"; al tocar vuelve al inicio con sonido; el único control es el altavoz (tocar el video
 también silencia/activa); sin play, pausa ni barra; al terminar ofrece "Ver de nuevo". Si el
-navegador bloquea el autoplay, el aviso pasa a "Toca para ver el video". El botón de compra aparece
-justo debajo al llegar a `REVEAL_AT_SECONDS` de **posición del video** (con o sin sonido; saltar
-más adelante también lo revela) y queda visible en visitas posteriores (`localStorage`). Al pulsarlo se abre un popup con el checkout de GHL en un iframe. Si la visita
+navegador bloquea el autoplay, el aviso pasa a "Toca para ver el video". El botón de compra bajo el
+video está visible desde el inicio (`REVEAL_AT_SECONDS = 0`); si se configura un retardo, aparece
+al llegar a esa **posición del video** (con o sin sonido; saltar más adelante también lo revela) y
+queda visible en visitas posteriores (`localStorage`). Al pulsarlo se abre un popup con el checkout de GHL en un iframe. Si la visita
 llega desde el quiz (`?dx=ordinario|debate|climax`), el hero abre con una línea personalizada.
 
 **Video.** El original (`Drive/Dr Campos/VSL/IMG_9199.MOV`) viene en HEVC, que Chrome y Android no
@@ -67,7 +68,9 @@ Las cifras coinciden con lo que el Dr. Campos dice en la lección 1.3 (3.000–6
      cambiar la respuesta, no para releer.
 3. **Captura** — nombre, email y WhatsApp con selector de país (el país se adivina por zona horaria).
 4. **Resultado** — puntaje sobre 27, medidor ECG con las tres bandas, diagnóstico completo
-   del tramo, recuento de plataformas declaradas y los CTA al método.
+   del tramo, recuento de plataformas declaradas, los CTA al método (`/?dx=<tramo>`) y una
+   **barra fija** inferior con "Ver el método" visible desde el primer momento. Sin opción de
+   repetir el test.
 
 Puntaje: 9 preguntas puntuadas × (A=1, B=2, C=3) → 9 a 27.
 Tramos: 9–14 consulta silenciosa · 15–21 el debate · 22–27 camino al alta médica.
@@ -86,7 +89,7 @@ Vite las inyecta en tiempo de build, no de ejecución.
 | --- | --- |
 | `VITE_VSL_URL` | Sobreescribe el mp4 del VSL. El default en `offer.js` es el archivo en GHL Media Storage (H.264 720p, faststart, con Range). |
 | `VITE_VSL_POSTER` | Sobreescribe la portada (default `/vsl-poster.jpg`, frame del propio video). |
-| `VITE_REVEAL_AT_SECONDS` | Segundo de reproducción en que aparece el botón bajo el video (default 60). El botón del bloque de oferta está siempre visible. `?cta=1` lo muestra sin memorizar; `?cta=0` borra la memoria del navegador. |
+| `VITE_REVEAL_AT_SECONDS` | Segundo de reproducción en que aparece el botón bajo el video. **Default 0: visible desde el inicio** (decisión del usuario; el retardo se recupera poniendo p. ej. 60). Con retardo, `?cta=1` lo muestra sin memorizar y `?cta=0` borra la memoria. |
 | `VITE_CHECKOUT_URL` | Checkout de GHL (payment link u order form) que se embebe en el popup. Sin ella el popup muestra un aviso. |
 | `VITE_CTA_URL` | Destino de los CTA del quiz. Default `/` (la landing); el diagnóstico viaja como `?dx=<result_id>`. |
 
@@ -109,8 +112,9 @@ Reglas del formulario (`src/quiz/screens/Capture.jsx`), sacadas del skill `ghl-e
   engancha el clic de cualquier `button[type=submit]` y envía el formulario 50 ms después
   aunque esté vacío; sin evento `submit`, no ve nada. Enter se replica a mano con el mismo
   camino. Prueba negativa: clic con todo vacío → 4 errores, cero envíos.
-- **Checkbox de consentimiento** (`name="consent"`, obligatorio) dentro del form, con
-  `consent_at` en hidden: queda registro y GHL puede tratar al contacto como suscrito.
+- **Sin checkbox de consentimiento** (decisión del usuario): bajo el botón va el aviso "Al pulsar
+  aceptas recibir…"; a GHL viajan `consent_text` (el aviso mostrado) y `consent_at` (hora del
+  envío, escrita en el input justo antes de `requestSubmit()`).
 - **Dato rico en inputs de texto `readOnly` ocultos con CSS** (no `hidden`), generados por
   `buildQuizFields()` en `quiz.js`: `score`, `result_id`, `result_stage`, `plataformas`,
   `q1_valor…q10_valor`, `tags`, `phone_country`, `consent_at`, más la atribución persistida por

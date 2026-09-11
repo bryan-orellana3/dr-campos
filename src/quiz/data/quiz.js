@@ -7,9 +7,9 @@
  */
 export const CTA_URL = import.meta.env.VITE_CTA_URL || '/';
 
-/** Texto del checkbox de consentimiento. Viaja a GHL con el formulario como evidencia. */
+/** Aviso bajo el botón (sin checkbox, decisión del usuario). Viaja a GHL como `consent_text`. */
 export const CONSENT_TEXT =
-  'Acepto recibir mi diagnóstico y el material del método por WhatsApp y correo. Sin spam; puedo darme de baja cuando quiera.';
+  'Al pulsar aceptas recibir tu diagnóstico y el material del método por WhatsApp y correo. Sin spam; puedes darte de baja cuando quieras.';
 
 export const QUESTIONS = [
   {

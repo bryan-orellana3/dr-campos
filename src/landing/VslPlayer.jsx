@@ -11,6 +11,7 @@ const REVEALED_KEY = 'dc-vsl-cta-revealed';
  */
 export function useCtaReveal() {
   const [revealed, setRevealed] = React.useState(() => {
+    if (REVEAL_AT_SECONDS <= 0) return true; // sin retardo: visible desde el primer render
     try {
       const cta = new URLSearchParams(window.location.search).get('cta');
       if (cta === '0') window.localStorage.removeItem(REVEALED_KEY);

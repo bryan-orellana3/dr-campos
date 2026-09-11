@@ -107,7 +107,7 @@ function platformSummary(answers, otherText) {
 
 /* ── pantalla ──────────────────────────────────────────────────────── */
 
-export default function Result({ score, result, answers, otherText, leadName, onRestart }) {
+export default function Result({ score, result, answers, otherText, leadName }) {
   const isMobile = useIsMobile();
   const platforms = platformSummary(answers, otherText);
   const accent = TONE[result.tone];
@@ -379,7 +379,7 @@ export default function Result({ score, result, answers, otherText, leadName, on
       </section>
 
       {/* Cierre */}
-      <section style={{ ...wrap, padding: isMobile ? '36px 20px 56px' : '48px 32px 80px' }}>
+      <section style={{ ...wrap, padding: isMobile ? '36px 20px 120px' : '48px 32px 140px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <PulseDivider align="left" width={240} />
           <blockquote
@@ -411,24 +411,90 @@ export default function Result({ score, result, answers, otherText, leadName, on
             Dr. David Campos
           </span>
 
-          <button
-            type="button"
-            onClick={onRestart}
-            style={{
-              alignSelf: 'flex-start',
-              background: 'none',
-              border: 'none',
-              padding: '8px 0',
-              cursor: 'pointer',
-              font: 'var(--type-body-sm)',
-              color: 'var(--text-muted)',
-              textDecoration: 'underline',
-            }}
-          >
-            Volver a hacer el diagnóstico
-          </button>
         </div>
       </section>
+
+      {/* Barra fija: la invitación al método acompaña todo el diagnóstico desde el inicio. */}
+      {!ctaDisabled && (
+        <div
+          className="dc-rise"
+          style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 60,
+            padding: isMobile ? '10px 16px calc(10px + env(safe-area-inset-bottom))' : '12px 32px calc(12px + env(safe-area-inset-bottom))',
+            background: 'rgba(246,248,251,0.96)',
+            backdropFilter: 'blur(8px)',
+            borderTop: '1px solid var(--border-subtle)',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 720,
+              margin: '0 auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+              <span style={{ font: '700 14px/1.2 var(--font-display)', color: 'var(--text-display)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {isMobile ? 'Tu tratamiento existe' : 'Tu tratamiento existe: el Método 4C'}
+              </span>
+              <span style={{ font: 'var(--type-caption)', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {isMobile ? 'Del Dr. David Campos' : '16 lecciones · el sistema documentado del Dr. David Campos'}
+              </span>
+            </div>
+            <a href={ctaHref} style={{ textDecoration: 'none', flex: 'none' }}>
+              <Button size="md" iconAfter={<ArrowRight size={16} />}>Ver el método</Button>
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Barra fija: la invitación al método acompaña todo el diagnóstico desde el inicio. */}
+      {!ctaDisabled && (
+        <div
+          className="dc-rise"
+          style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 60,
+            padding: isMobile ? '10px 16px calc(10px + env(safe-area-inset-bottom))' : '12px 32px calc(12px + env(safe-area-inset-bottom))',
+            background: 'rgba(246,248,251,0.96)',
+            backdropFilter: 'blur(8px)',
+            borderTop: '1px solid var(--border-subtle)',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: 720,
+              margin: '0 auto',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 12,
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+              <span style={{ font: '700 14px/1.2 var(--font-display)', color: 'var(--text-display)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {isMobile ? 'Tu tratamiento existe' : 'Tu tratamiento existe: el Método 4C'}
+              </span>
+              <span style={{ font: 'var(--type-caption)', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {isMobile ? 'Del Dr. David Campos' : '16 lecciones · el sistema documentado del Dr. David Campos'}
+              </span>
+            </div>
+            <a href={ctaHref} style={{ textDecoration: 'none', flex: 'none' }}>
+              <Button size="md" iconAfter={<ArrowRight size={16} />}>Ver el método</Button>
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
