@@ -140,9 +140,13 @@ del selector de WhatsApp están en [`src/quiz/data/countries.js`](src/quiz/data/
 
 ## Nota de marca
 
-El logo master no tiene variante en negativo. Sobre fondo oscuro, `BrandLock` compone la
-marca como manda el sistema: isotipo (orbe de foto) + logotipo tipografiado (script "Dr." +
-Montserrat ExtraBold en caja alta). **Pendiente: pedir a marca el logo en negativo oficial.**
+Sobre fondo oscuro, `BrandLock` compone la marca en horizontal: isotipo (orbe de foto) + el
+trazo caligráfico oficial **"Dr."** + "DAVID CAMPOS" en Montserrat ExtraBold. El trazo es
+`public/dr-script.png`, una máscara alfa recortada del lockup oscuro oficial que hay en
+`Identidad GHL/Logo Dr David Campos - 640x640 fondo oscuro.png` (ese lockup existe, pero es
+apilado — orbe arriba — y no sirve de cabecera), teñida por CSS con `mask-image`. Fuente de
+92 px de alto: si marca entrega el "Dr" aislado en SVG, se sustituye el archivo y queda vectorial.
+En los textos corridos se escribe "Dr." tipográfico; el trazo es solo para el lockup.
 
 `public/isotipo.webp` se recortó del retrato original ajustando la circunferencia del disco
 (centro y radio) para que la foto llene el círculo sin margen muerto; lleva máscara alfa con

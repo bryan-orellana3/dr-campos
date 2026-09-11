@@ -172,11 +172,15 @@ export function PulseDivider({ onDark = false, width = '100%', align = 'center',
   );
 }
 
+/** Proporción ancho/alto del trazo "Dr." (public/dr-script.png, recortado del lockup oficial). */
+const DR_SCRIPT_RATIO = 1.957;
+
 /**
  * Bloque de marca.
- * En claro usa el logo master (`logo.png`). En oscuro NO existe variante knockout oficial,
- * así que se compone según el sistema: isotipo (orbe de foto) + logotipo tipografiado
- * (script "Dr." + Montserrat ExtraBold en caja alta). Pendiente: pedir el logo en negativo a marca.
+ * En claro usa el logo master (`logo.png`). En oscuro se compone en horizontal: isotipo (orbe
+ * de foto) + el trazo caligráfico oficial "Dr." (máscara CSS teñida, extraído del lockup oscuro
+ * de Identidad GHL) + "DAVID CAMPOS" en Montserrat ExtraBold. El lockup oscuro oficial existe
+ * pero es apilado (orbe arriba); para cabeceras hace falta esta versión horizontal.
  */
 export function BrandLock({ onDark = false, size = 48, style }) {
   if (!onDark) {
@@ -209,14 +213,24 @@ export function BrandLock({ onDark = false, size = 48, style }) {
       />
       <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: size * 0.1 }}>
         <span
+          role="img"
+          aria-label="Dr."
           style={{
-            font: `400 ${size * 0.62}px/0.8 var(--font-script)`,
-            color: 'var(--dc-sky-300)',
-            transform: `translateY(${size * 0.06}px)`,
+            display: 'inline-block',
+            height: size * 0.56,
+            width: size * 0.56 * DR_SCRIPT_RATIO,
+            background: 'var(--dc-sky-300)',
+            WebkitMaskImage: 'url(/dr-script.png)',
+            maskImage: 'url(/dr-script.png)',
+            WebkitMaskSize: 'contain',
+            maskSize: 'contain',
+            WebkitMaskRepeat: 'no-repeat',
+            maskRepeat: 'no-repeat',
+            WebkitMaskPosition: 'center',
+            maskPosition: 'center',
+            transform: `translateY(${size * 0.04}px)`,
           }}
-        >
-          Dr.
-        </span>
+        />
         <span
           style={{
             font: `800 ${size * 0.4}px/1 var(--font-display)`,
