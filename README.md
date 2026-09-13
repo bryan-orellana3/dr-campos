@@ -78,6 +78,14 @@ está configurado en GHL con *On Submit → Redirect to URL →* `https://dr-dav
 completa, con lo que el popup desaparece. Como respaldo, `CheckoutModal` escucha `postMessage` del
 origen de GHL y, si el mensaje indica envío, cierra y navega a `/gracias`.
 
+**Gracias.** `/gracias` confirma la compra y da dos pasos: revisar el correo de acceso (llega al
+correo con el que se compró; se avisa de spam y promociones) y entrar a la plataforma —
+`app.doctordavidcampos.com`, el portal de clientes de GHL, como botón principal. Al pie, el correo
+de soporte con `mailto:` y asunto precargado. Se usa `soporte@mail.doctordavidcampos.com` porque
+ese subdominio es el que **recibe** correo (MX de Mailgun + SPF de LeadConnector, las respuestas
+entran a Conversations de GHL): el dominio raíz `doctordavidcampos.com` no tiene MX y una dirección
+ahí rebotaría. Ambos valores están en `ACCESS` y `SUPPORT` de `offer.js`.
+
 Evidencia: cuatro liquidaciones de Meta (`public/proof-*.jpg`) recortadas por encima de
 "Informações da transação" para no mostrar identificadores ni banco, y dos apariciones en TV.
 Las cifras coinciden con lo que el Dr. Campos dice en la lección 1.3 (3.000–6.000 US$/mes).

@@ -46,6 +46,23 @@ export const OFFER_TIMER = {
   expired: 'La oferta está por cerrar',
 };
 
+/**
+ * Acceso y soporte tras la compra (página /gracias).
+ * `app.doctordavidcampos.com` es el portal de clientes de GHL. El correo de soporte va en
+ * `mail.doctordavidcampos.com` porque es el subdominio que **recibe** correo (MX de Mailgun +
+ * SPF de LeadConnector, las respuestas entran a Conversations); el dominio raíz no tiene MX.
+ */
+export const ACCESS = {
+  url: 'https://app.doctordavidcampos.com',
+  domain: 'app.doctordavidcampos.com',
+  cta: 'Entrar a la plataforma',
+};
+
+export const SUPPORT = {
+  email: 'soporte@mail.doctordavidcampos.com',
+  subject: 'Acceso al Método 4C',
+};
+
 export const GUARANTEE = {
   title: 'Garantía de 7 días',
   text: 'Si en la primera semana sientes que el método no es para ti, escribes y te devolvemos el dinero. Sin formularios ni explicaciones.',
