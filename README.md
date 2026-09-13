@@ -6,7 +6,7 @@ Una sola app (Vite + React + React Router) con las piezas del funnel, sobre el
 | Ruta | Qué es | Estado |
 | --- | --- | --- |
 | `/` | Landing del VSL — Método 4C | en producción; el video y el checkout se activan por variables (abajo) |
-| `/quiz` | Autodiagnóstico digital para médicos | en producción — `dr-david-campos.vercel.app` (alias histórico: `quiz-riesgo-digital.vercel.app`) |
+| `/quiz` | Autodiagnóstico digital para médicos | en producción — `www.doctordavidcampos.com` (antes `dr-david-campos.vercel.app`; alias histórico `quiz-riesgo-digital.vercel.app`) |
 | `/gracias` | Página de gracias tras el checkout | en producción; el formulario de GHL debe redirigir aquí *On Submit* |
 
 ```
@@ -74,7 +74,7 @@ acompaña toda la página (se oculta mientras el popup está abierto). En móvil
 precio + reloj compacto arriba, botón a todo el ancho abajo. Sin invitación al quiz al pie.
 
 **Checkout.** El botón de compra abre un popup con el order form de GHL en un iframe. El formulario
-está configurado en GHL con *On Submit → Redirect to URL →* `https://dr-david-campos.vercel.app/gracias`: `form_embed.js` aplica esa redirección a la página
+está configurado en GHL con *On Submit → Redirect to URL →* `https://www.doctordavidcampos.com/gracias`: `form_embed.js` aplica esa redirección a la página
 completa, con lo que el popup desaparece. Como respaldo, `CheckoutModal` escucha `postMessage` del
 origen de GHL y, si el mensaje indica envío, cierra y navega a `/gracias`.
 
